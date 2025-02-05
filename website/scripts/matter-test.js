@@ -365,3 +365,98 @@ function doublePendulum() {
 
     Composite.add(world, mouseConstraint);
 }
+
+function angerBird() {
+    // create engine
+    var engine = Engine.create(),
+        world = engine.world;
+    
+    // create renderer
+    var render = Render.create({
+        element: testContainer,
+        engine: engine,
+        options: {
+            width: width,
+            height: height,
+            showAngleIndicator: true,
+        }
+    });
+    
+    Render.run(render);
+    
+    // create runner
+    var runner = Runner.create();
+    Runner.run(runner, engine);
+
+	// angry
+	var plank = {
+		height: height/5,
+		width: width/50,
+	}
+
+	var slingshot = Bodies.rectangle(width/5, height - height/10 - 25, plank.width, plank.height, { isStatic: true, collisionFilter: { category: 69 } });
+
+	Composite.add(world, slingshot);
+
+	function makePlank(x, y, rotato) {
+		if (rotato) {
+			var object = Bodies.rectangle(x, y, plank.width, plank.height);
+		} else {
+			var object = Bodies.rectangle(x, y, plank.height, plank.width);
+		}
+
+		Composite.add(world, object);
+	}
+
+	// bird
+	var bird = Bodies.circle(width/5, height - height/10 - 25, width/30);
+	Composite.add(world, bird);
+
+	var sproingus = Constraint.create({ bodyA: bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: 0.2, length: 50 });
+	Composite.add(world, sproingus);
+
+	// bad piggie
+	for (let i = 0; i < 3; i ++) {
+		makePlank((plank.height) * i + width - width/3, height - height/10 - 25, true);
+	}
+
+	for (let i = 0; i < 2; i ++) {
+		makePlank((plank.height) * i + width - width/3 + plank.height/2, height - plank.height - 25 - plank.width/2, false);
+	}
+
+	for (let i = 0; i < 2; i ++) {
+		makePlank((plank.height) * i + width - width/3 + plank.height/2, height - height/10 - 25 - plank.height - plank.width, true);
+	}
+
+	makePlank(plank.height + width - width/3, height - plank.height*2 - 25 - plank.width*1.5, false);
+    
+    Composite.add(world, [
+        Bodies.rectangle(width/2, 0, width, 50, { isStatic: true }), // top
+        Bodies.rectangle(width, height/2, 50, height, { isStatic: true }), // right
+        Bodies.rectangle(width/2, height, width, 50, { isStatic: true }), // bottom
+        Bodies.rectangle(0, height/2, 50, height, { isStatic: true }) // left
+    ]);
+    
+    // add mouse control
+    var mouse = Mouse.create(render.canvas),
+        mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.9,
+                render: {
+                    visible: false
+                }
+            }
+        });
+    
+    Composite.add(world, mouseConstraint);
+    
+    // keep the mouse in sync with rendering
+    render.mouse = mouse;
+    
+    // fit the render viewport to the scene
+    Render.lookAt(render, {
+        min: { x: 0, y: 0 },
+        max: { x: width, y: height }
+    });
+}
