@@ -1,3 +1,6 @@
+// TODO: Make it so you can't move the planks with the cursor in anger bird
+// TODO: make anger bird respawn automatically
+
 var Engine = Matter.Engine,
     Render = Matter.Render,
     Runner = Matter.Runner,
@@ -394,7 +397,7 @@ function angerBird() {
 		width: width/50,
 	}
 
-	var slingshot = Bodies.rectangle(width/5, height - height/10 - 25, plank.width, plank.height, { isStatic: true, collisionFilter: { category: 69 } });
+	var slingshot = Bodies.rectangle(width/5, height - height/10 - 25, plank.width, plank.height, { isStatic: true, collisionFilter: { mask: 0b0 } });
 
 	Composite.add(world, slingshot);
 
@@ -409,10 +412,10 @@ function angerBird() {
 	}
 
 	// bird
-	var bird = Bodies.circle(width/5, height - height/10 - 25, width/30);
+	var bird = Bodies.circle(width/5, height - height/10 - 25, width/30, { collisionFilter: { mask: 0b1 } });
 	Composite.add(world, bird);
 
-	var sproingus = Constraint.create({ bodyA: bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: 0.2, length: 50 });
+	var sproingus = Constraint.create({ bodyA: bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: 0.1, length: 50 });
 	Composite.add(world, sproingus);
 
 	// bad piggie
@@ -442,10 +445,13 @@ function angerBird() {
         mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
             constraint: {
-                stiffness: 0.9,
+                stiffness: 0.5,
                 render: {
                     visible: false
                 }
+            },
+            collisionFilter: {
+                category: 0b1
             }
         });
     
