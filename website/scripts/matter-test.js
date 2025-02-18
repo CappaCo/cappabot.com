@@ -466,5 +466,3 @@ function angerBird() {
         max: { x: width, y: height }
     });
 }
-
-angerBird();
