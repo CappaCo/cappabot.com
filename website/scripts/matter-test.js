@@ -371,6 +371,17 @@ function doublePendulum() {
     Composite.add(world, mouseConstraint);
 }
 
+class Bird {
+    constructor(x, y, world, plank, slingshot) {
+        this.bird = Bodies.circle(width/5, height - plank.height, width/30, { collisionFilter: { mask: 0b1 } });
+        this.sproingus = Constraint.create({ bodyA: this.bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: 0.1, length: 0 });
+        this.x = x;
+        this.y = y;
+
+        Composite.add(world, [this.bird, this.sproingus]);
+    }
+}
+
 function angerBird() {
     // create engine
     var engine = Engine.create(),
@@ -414,13 +425,6 @@ function angerBird() {
 		Composite.add(world, object);
 	}
 
-	// bird
-	var bird = Bodies.circle(width/5, height - height/10 - 25, width/30, { collisionFilter: { mask: 0b1 } });
-	Composite.add(world, bird);
-
-	var sproingus = Constraint.create({ bodyA: bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: 0.1, length: 50 });
-	Composite.add(world, sproingus);
-
 	// bad piggie
 	for (let i = 0; i < 3; i ++) {
 		makePlank((plank.height) * i + width - width/3, height - height/10 - 25, true);
@@ -442,6 +446,9 @@ function angerBird() {
         Bodies.rectangle(width/2, height, width, 50, { isStatic: true }), // bottom
         Bodies.rectangle(0, height/2, 50, height, { isStatic: true }) // left
     ]);
+
+    // anger bird
+    const bird1 = new Bird(width/5, height - height/10 - 25, world, plank, slingshot);
     
     // add mouse control
     var mouse = Mouse.create(render.canvas),
