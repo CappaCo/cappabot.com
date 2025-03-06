@@ -15,6 +15,7 @@
     </url>
     <url>
         <loc>https://cappabot.com/matterjs</loc>
+        <priority>0.6</priority>
     </url>
     <url>
         <loc>https://cappabot.com/threejs</loc>
