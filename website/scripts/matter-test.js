@@ -1,11 +1,11 @@
 // TODO: Make it so you can't move the planks with the cursor in anger bird
-// TODO: make anger bird respawn automatically
 
 // deno-lint-ignore-file no-unused-vars no-var
 
 var Engine = Matter.Engine,
     Render = Matter.Render,
     Runner = Matter.Runner,
+    Events = Matter.Events,
     Composites = Matter.Composites,
     Common = Matter.Common,
     MouseConstraint = Matter.MouseConstraint,
@@ -372,13 +372,53 @@ function doublePendulum() {
 }
 
 class Bird {
-    constructor(x, y, world, plank, slingshot) {
-        this.bird = Bodies.circle(width/5, height - plank.height, width/30, { collisionFilter: { mask: 0b1 } });
-        this.sproingus = Constraint.create({ bodyA: this.bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: 0.1, length: 0 });
-        this.x = x;
-        this.y = y;
+    constructor(x, y, world, plank, slingshot, mouseConstraint) {
+        this.initx = x;
+        this.inity = y;
+        this.world = world;
+
+        this.stiffness = 0.01;
+        this.attachTime = 2500;
+
+        this.mouseConstraint = mouseConstraint;
+        
+        this.update = this.update.bind(this);
+        this.attach = this.attach.bind(this);
+        this.checkBody = this.checkBody.bind(this);
+
+        this.bird = Bodies.circle(x, y, width/30, { collisionFilter: { mask: 0b1 } });
+        this.sproingus = Constraint.create({ bodyA: this.bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: this.stiffness, length: 0 });
 
         Composite.add(world, [this.bird, this.sproingus]);
+    }
+
+    update() {
+        if (Constraint.currentLength(this.sproingus) < 50 && Body.getSpeed(this.bird) > 20 && !this.checkBody()) {
+            this.detach();
+        }
+    }
+
+    detach() {
+        this.sproingus.stiffness = 0;
+        this.sproingus.render.visible = false;
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(this.attach, this.attachTime);
+    }
+
+    attach() {
+        Body.setPosition(this.bird, { x: this.initx, y: this.inity });
+        this.sproingus.stiffness = this.stiffness;
+        this.sproingus.render.visible = true;
+    }
+
+    checkBody() {
+        const allConstraints = Composite.allConstraints(this.world);
+        for (let i = 0; i < allConstraints.length; i++) {
+            if (allConstraints[i].label == "Mouse Constraint" && (allConstraints[i].bodyA === this.bird || allConstraints[i].bodyB === this.bird)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -446,9 +486,6 @@ function angerBird() {
         Bodies.rectangle(width/2, height, width, 50, { isStatic: true }), // bottom
         Bodies.rectangle(0, height/2, 50, height, { isStatic: true }) // left
     ]);
-
-    // anger bird
-    const bird1 = new Bird(width/5, height - height/10 - 25, world, plank, slingshot);
     
     // add mouse control
     var mouse = Mouse.create(render.canvas),
@@ -466,6 +503,10 @@ function angerBird() {
         });
     
     Composite.add(world, mouseConstraint);
+
+    // anger bird
+    const bird1 = new Bird(width/5, height - plank.height, world, plank, slingshot, runner, mouseConstraint);
+    Events.on(runner, "tick", bird1.update);
     
     // keep the mouse in sync with rendering
     render.mouse = mouse;
