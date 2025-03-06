@@ -379,21 +379,19 @@ class Bird {
 
         this.stiffness = 0.01;
         this.attachTime = 2500;
-
-        this.mouseConstraint = mouseConstraint;
         
         this.update = this.update.bind(this);
         this.attach = this.attach.bind(this);
         this.checkBody = this.checkBody.bind(this);
 
-        this.bird = Bodies.circle(x, y, width/30, { collisionFilter: { mask: 0b1 } });
+        this.bird = Bodies.circle(x, y, width/30, { collisionFilter: { category: 0b10 } });
         this.sproingus = Constraint.create({ bodyA: this.bird, bodyB: slingshot, pointB: { x: 0, y: plank.width/2 - plank.height/2 }, stiffness: this.stiffness, length: 0 });
 
         Composite.add(world, [this.bird, this.sproingus]);
     }
 
     update() {
-        if (Constraint.currentLength(this.sproingus) < 50 && Body.getSpeed(this.bird) > 20 && !this.checkBody()) {
+        if (Constraint.currentLength(this.sproingus) < height/10 && Body.getSpeed(this.bird) > height/50 && !this.checkBody()) {
             this.detach();
         }
     }
@@ -401,14 +399,21 @@ class Bird {
     detach() {
         this.sproingus.stiffness = 0;
         this.sproingus.render.visible = false;
+
+        this.bird.collisionFilter.category = 0b100;
+
         clearTimeout(this.timeout);
         this.timeout = setTimeout(this.attach, this.attachTime);
     }
 
     attach() {
-        Body.setPosition(this.bird, { x: this.initx, y: this.inity });
         this.sproingus.stiffness = this.stiffness;
         this.sproingus.render.visible = true;
+
+        this.bird.collisionFilter.category = 0b110;
+
+        Body.setPosition(this.bird, { x: this.initx, y: this.inity });
+        Body.setSpeed(this.bird, 0);
     }
 
     checkBody() {
@@ -455,12 +460,16 @@ function angerBird() {
 	Composite.add(world, slingshot);
 
 	function makePlank(x, y, rotato) {
-        let object;
+        let w, h;
 		if (rotato) {
-			object = Bodies.rectangle(x, y, plank.width, plank.height);
+			w = plank.width;
+            h = plank.height;
 		} else {
-			object = Bodies.rectangle(x, y, plank.height, plank.width);
+			w = plank.height;
+            h = plank.width;
 		}
+
+        var object = Bodies.rectangle(x, y, w, h);
 
 		Composite.add(world, object);
 	}
@@ -481,10 +490,10 @@ function angerBird() {
 	makePlank(plank.height + width - width/3, height - plank.height*2 - 25 - plank.width*1.5, false);
     
     Composite.add(world, [
-        Bodies.rectangle(width/2, 0, width, 50, { isStatic: true }), // top
-        Bodies.rectangle(width, height/2, 50, height, { isStatic: true }), // right
+        //Bodies.rectangle(width/2, 0, width, 50, { isStatic: true }), // top
+        //Bodies.rectangle(width, height/2, 50, height, { isStatic: true }), // right
         Bodies.rectangle(width/2, height, width, 50, { isStatic: true }), // bottom
-        Bodies.rectangle(0, height/2, 50, height, { isStatic: true }) // left
+        //Bodies.rectangle(0, height/2, 50, height, { isStatic: true }) // left
     ]);
     
     // add mouse control
@@ -498,15 +507,15 @@ function angerBird() {
                 }
             },
             collisionFilter: {
-                category: 0b1
+                mask: 0b10
             }
         });
     
     Composite.add(world, mouseConstraint);
 
     // anger bird
-    const bird1 = new Bird(width/5, height - plank.height, world, plank, slingshot, runner, mouseConstraint);
-    Events.on(runner, "tick", bird1.update);
+    const bird = new Bird(width/5, height - plank.height, world, plank, slingshot, runner, mouseConstraint);
+    Events.on(runner, "tick", bird.update);
     
     // keep the mouse in sync with rendering
     render.mouse = mouse;
