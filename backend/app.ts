@@ -1,6 +1,8 @@
 import { walk } from "@std/fs";
 import mime from "npm:mime";
 
+const messages: string[] = [];
+
 // This function returns the filepath of a file in the website directory
 // It allows html pages to be found without the need to add .html in the URL
 async function getTheFile(filePath: string): Promise<string> {
@@ -31,7 +33,7 @@ async function getTheFile(filePath: string): Promise<string> {
 }
 
 // API requests are to cappabot.com/api/*
-function apiRequest(req: Request): Response {
+async function apiRequest(req: Request): Promise<Response> {
     const reqMethod = req.method;
     const reqURL = new URL(req.url);
     let reqPath = reqURL.pathname.replace("/api", "");
@@ -51,6 +53,24 @@ function apiRequest(req: Request): Response {
             );
         } else return new Response('Only "GET" to /api/status pls');
     }
+
+    else if (reqPath.startsWith("/chat")) {
+        if (reqMethod == "POST") {
+            const data = await req.text();
+            console.log(data);
+
+            if (messages.unshift(data) > 10) messages.splice(10 - messages.length);
+
+            return new Response("burger");
+        }
+
+        else if (reqMethod == "GET") {
+            return new Response(JSON.stringify(messages));
+        }
+
+        return new Response("yeah nah");
+    }
+
     // Pretty much a 404 for api requests
     return new Response(`API request to ${reqPath} could not be resolved`, {
         status: 404,
