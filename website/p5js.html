@@ -21,10 +21,12 @@
 
             <p>
                 Press the buttons to do things<br>
-                (Reload the page to restart)<br>
-                <button onclick="new p5(bouncingBall)">Bouncing circle</button>
-                <button onclick="new p5(bouncingBalls)">Bouncing circles</button>
-                <button onclick="new p5(badPendulum)">Bad double pendulum</button>
+                <button onclick="deleteTests()">Delete tests</button>
+                <button onclick="toggleAutoDelete()" id="autoDeleteButton">Auto delete</button>
+                <br>
+                <button onclick="runTest(bouncingBall, 'p5')">Bouncing circle</button>
+                <button onclick="runTest(bouncingBalls, 'p5')">Bouncing circles</button>
+                <button onclick="runTest(badPendulum, 'p5')">Bad double pendulum</button>
             </p>
 
             <div id="test-container"></div>

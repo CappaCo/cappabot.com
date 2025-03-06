@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-unused-vars no-var
+
 var Engine = Matter.Engine,
     Render = Matter.Render,
     Runner = Matter.Runner,
@@ -280,7 +282,7 @@ function cradle() {
         var newtonsCradle = Composite.create({ label: 'Newtons Cradle' });
 
         separation = 0.95
-        for (var i = 0.5; i < number + 0.5; i++) {
+        for (let i = 0.5; i < number + 0.5; i++) {
             circle = Bodies.circle(xx + ((i - number/2) * size), yy + length, size/2, 
                 { inertia: Infinity, restitution: 1, friction: 0, frictionAir: 0, slop: size * 0.02 });
 
@@ -341,7 +343,7 @@ function doublePendulum() {
     var runner = Runner.create();
     Runner.run(runner, engine);
 
-    let minLen = Math.min(width, height)/4;
+    const minLen = Math.min(width, height)/4;
 
     var
     circle1 = Bodies.circle(width/2, height/2 - minLen, minLen/5, { frictionAir: 0, friction: 0, frictionStatic: 0, intertia: Infinity}),
@@ -399,10 +401,11 @@ function angerBird() {
 	Composite.add(world, slingshot);
 
 	function makePlank(x, y, rotato) {
+        let object;
 		if (rotato) {
-			var object = Bodies.rectangle(x, y, plank.width, plank.height);
+			object = Bodies.rectangle(x, y, plank.width, plank.height);
 		} else {
-			var object = Bodies.rectangle(x, y, plank.height, plank.width);
+			object = Bodies.rectangle(x, y, plank.height, plank.width);
 		}
 
 		Composite.add(world, object);

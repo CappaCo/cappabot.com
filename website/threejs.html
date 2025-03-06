@@ -13,8 +13,8 @@
         <script type="importmap">
             {
                 "imports": {
-                    "three": "https://cdn.jsdelivr.net/npm/three@0.107.0/build/three.module.js",
-                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.107.0/examples/jsm/"
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js",
+                    "three/addons/controls/OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js"
                 }
             }
         </script>
@@ -31,9 +31,11 @@
 
             <p>
                 Press the buttons to load scenes<br>
-                (Reload the page to restart)<br>
-                <button onclick="cylinder()">Cylinder</button>
-                <button onclick="someShapes()">Some Shapes</button>
+                <button onclick="deleteTests()">Delete tests</button>
+                <button onclick="toggleAutoDelete()" id="autoDeleteButton">Auto delete</button>
+                <br>
+                <button onclick="runTest(cylinder)">Cylinder</button>
+                <button onclick="runTest(someShapes)">Some Shapes</button>
             </p>
 
             <div id="test-container"></div>

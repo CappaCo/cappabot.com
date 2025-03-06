@@ -21,13 +21,15 @@
 
             <p>
                 Press the buttons to start tests<br>
-                (Reload the page to restart)<br>
-                <button onclick="angerBird()">Anger bird</button>
-                <button onclick="mixedShapes()">Mixed Shapes</button>
-                <button onclick="cubeStack()">Cube Stack</button>
-                <button onclick="soft()">Soft Body</button>
-                <button onclick="cradle()">Newton's cradle</button>
-                <button onclick="doublePendulum()">Double pendulum</button>
+                <button onclick="deleteTests()">Delete tests</button>
+                <button onclick="toggleAutoDelete()" id="autoDeleteButton">Auto delete</button>
+                <br>
+                <button onclick="runTest(angerBird)">Anger bird</button>
+                <button onclick="runTest(mixedShapes)">Mixed Shapes</button>
+                <button onclick="runTest(cubeStack)">Cube Stack</button>
+                <button onclick="runTest(soft)">Soft Body</button>
+                <button onclick="runTest(cradle)">Newtons cradle</button>
+                <button onclick="runTest(doublePendulum)">Double pendulum</button>
             </p>
 
             <div id="test-container"></div>
