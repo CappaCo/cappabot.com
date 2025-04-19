@@ -1,10 +1,75 @@
-import { walk } from "@std/fs";
+import { walk } from "@std/fs/walk";
 import mime from "npm:mime";
 
-const messages: string[] = [];
+console.log("loading addons");
+
+let addonsEnabled = false;
+const dirContents = Deno.readDir("./backend/");
+for await (const dirEntry of dirContents) {
+    if (dirEntry.isDirectory && dirEntry.name == "addons") {
+        console.log("addons folder found");
+        addonsEnabled = true;
+    }
+}
+
+if (!addonsEnabled) console.log("addons folder not found");
+
+class Addon {
+
+    fileName: string;
+    path: string | undefined;
+
+    constructor(fileName: string) {
+        this.fileName = fileName;
+        console.log("Creating new addon with filename: " + this.fileName);
+        
+        this.load();
+    }
+
+    async load() {
+        //try {
+            const addonImport = await import("./addons/" + this.fileName);
+
+            this.checkRequirements(addonImport);
+
+            this.run = addonImport.run;
+            this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
+            console.log("path: " + this.path);
+        //} catch (_err) {
+        //    console.log("addons don't work");
+        //}
+    }
+
+    private checkRequirements(addonImport: any) {
+        const requiredStuff = ["run", "path"];
+
+        for (const name of requiredStuff) {
+            if (typeof addonImport[name] === "undefined") {
+                throw new Error(`function '${name}' not found in ${this.fileName}`);
+            }
+        }
+    }
+
+    run(_req: Request): Response {
+        console.log("run function not set yet");
+        return new Response("server is being lazy, just wait a sec");
+    }
+}
+
+const addons: Array<Addon> = [];
+if (addonsEnabled) {
+    const addonsDirectory = "backend/addons/";
+    const addonsFiles = walk("./" + addonsDirectory);
+    for await (const addonsFile of addonsFiles) {
+        if (addonsFile.isFile) {
+            addons.push(new Addon("/" + addonsFile.path.slice(addonsDirectory.length)));
+        }
+    }
+}
 
 // This function returns the filepath of a file in the website directory
 // It allows html pages to be found without the need to add .html in the URL
+// It will fallback to the 404 page if the file is not found
 async function getTheFile(filePath: string): Promise<string> {
     // The / path returns index.html
     if (filePath == "/") return "/index.html";
@@ -30,51 +95,6 @@ async function getTheFile(filePath: string): Promise<string> {
 
     // If no files are found, return the 404 page
     return "/404.html";
-}
-
-// API requests are to cappabot.com/api/*
-async function apiRequest(req: Request): Promise<Response> {
-    const reqMethod = req.method;
-    const reqURL = new URL(req.url);
-    let reqPath = reqURL.pathname.replace("/api", "");
-
-    // If it's a status request
-    if (reqPath.startsWith("/status")) {
-        // Make sure it's a get request
-        if (reqMethod == "GET") {
-            // Remove status from the URL
-            reqPath = reqPath.replace("/status", "");
-
-            // There could be a whole bunch of statuses for each service on cappabot.com
-
-            // If there is no status path, say cappabot.com is up
-            return new Response(
-                "gup (This means that cappabot.com is up)",
-            );
-        } else return new Response('Only "GET" to /api/status pls');
-    }
-
-    else if (reqPath.startsWith("/chat")) {
-        if (reqMethod == "POST") {
-            const data = await req.text();
-            console.log(data);
-
-            if (messages.unshift(data) > 10) messages.splice(10 - messages.length);
-
-            return new Response("burger");
-        }
-
-        else if (reqMethod == "GET") {
-            return new Response(JSON.stringify(messages));
-        }
-
-        return new Response("yeah nah");
-    }
-
-    // Pretty much a 404 for api requests
-    return new Response(`API request to ${reqPath} could not be resolved`, {
-        status: 404,
-    });
 }
 
 // Handle requests to the website part of cappabot.com
@@ -107,8 +127,19 @@ async function handler(req: Request) {
     const reqURL = new URL(req.url);
     const reqPath = reqURL.pathname;
 
-    // API requests
-    if (reqPath.startsWith("/api")) return apiRequest(req);
+    console.log("reqPath: " + reqPath);
+
+    // Check addons for the request
+    if (addonsEnabled) {
+        console.log("searching in addons");
+        for (const addon of addons) {
+            const validPaths = [addon.path, addon.path + "/"];
+            if (validPaths.includes(reqPath)) {
+                console.log("found: " + addon.path);
+                return addon.run(req);
+            }
+        }
+    }
 
     // If the request method is GET
     if (reqMethod == "GET") {
