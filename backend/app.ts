@@ -1,5 +1,4 @@
 import { walk } from "@std/fs";
-import { CHAR_0 } from "https://jsr.io/@std/path/1.0.8/_common/constants.ts";
 import mime from "npm:mime";
 
 const messages: string[] = [];
