@@ -28,13 +28,17 @@ class Addon {
     }
 
     async load() {
-        const addonImport = await import("./addons/" + this.fileName);
+        try {
+            const addonImport = await import("./addons/" + this.fileName);
 
-        this.checkRequirements(addonImport);
+            this.checkRequirements(addonImport);
 
-        this.run = addonImport.run;
-        this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
-        console.log("path: " + this.path);
+            this.run = addonImport.run;
+            this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
+            console.log("path: " + this.path);
+        } catch (_err) {
+            console.log("addons don't work");
+        }
     }
 
     private checkRequirements(addonImport: any) {
