@@ -1,8 +1,6 @@
 import { walk } from "@std/fs/walk";
 import mime from "npm:mime";
 
-const messages: string[] = [];
-
 console.log("loading addons");
 
 let addonsEnabled = false;
@@ -15,8 +13,6 @@ for await (const dirEntry of dirContents) {
 }
 
 if (!addonsEnabled) console.log("addons folder not found");
-
-//fetch("https://cappabot.com/api/chat", { method: "POST", body: "spring bing: " + addonsEnabled });
 
 class Addon {
 
@@ -32,15 +28,18 @@ class Addon {
     }
 
     async load() {
-		fetch("https://cappabot.com/api/chat", { method: "POST", body: "spring bing: " + this.fileName });
-
-        const addonImport = await import("./addons/" + this.fileName);
-
-        this.checkRequirements(addonImport);
-
-        this.run = addonImport.run;
-        this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
-        console.log("path: " + this.path);
+        try {
+            const addonImport = await import("./addons/" + this.fileName);
+    
+            this.checkRequirements(addonImport);
+    
+            this.run = addonImport.run;
+            this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
+            console.log("path: " + this.path);
+        } catch (err) {
+            console.log("addons didn't work");
+            console.log(err);
+        }
     }
 
     private checkRequirements(addonImport: any) {
