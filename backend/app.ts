@@ -23,7 +23,7 @@ class Addon {
         this.fileName = fileName;
         console.log("Creating new addon with filename: " + this.fileName);
         
-        //this.load();
+        this.load();
     }
 
     async load() {
@@ -66,12 +66,6 @@ if (addonsEnabled) {
         }
     }
 }
-
-setTimeout(() => {
-    for (const addon of addons) {
-        addon.load();
-    }
-}, 5000);
 
 // This function returns the filepath of a file in the website directory
 // It allows html pages to be found without the need to add .html in the URL
