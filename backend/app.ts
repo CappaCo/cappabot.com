@@ -28,18 +28,13 @@ class Addon {
     }
 
     async load() {
-        try {
-            const addonImport = await import("./addons/" + this.fileName);
-    
-            this.checkRequirements(addonImport);
-    
-            this.run = addonImport.run;
-            this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
-            console.log("path: " + this.path);
-        } catch (err) {
-            console.log("addons didn't work");
-            console.log(err);
-        }
+        const addonImport = await import("./addons/" + this.fileName);
+
+        this.checkRequirements(addonImport);
+
+        this.run = addonImport.run;
+        this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
+        console.log("path: " + this.path);
     }
 
     private checkRequirements(addonImport: any) {
@@ -137,6 +132,7 @@ async function handler(req: Request) {
         for (const addon of addons) {
             const validPaths = [addon.path, addon.path + "/"];
             if (validPaths.includes(reqPath)) {
+                console.log("found: " + addon.path);
                 return addon.run(req);
             }
         }
