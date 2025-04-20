@@ -8,6 +8,8 @@ COPY website/ ./website/
 COPY deno.json .
 COPY deno.lock .
 
+RUN chown -R deno:deno /app
+
 USER deno
 
 EXPOSE 8000
