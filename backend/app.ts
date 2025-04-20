@@ -1,71 +1,36 @@
 import { walk } from "@std/fs/walk";
 import mime from "npm:mime";
 
-console.log("loading addons");
+import { Addon } from "./addon.ts";
+
+// TODO: Comment stuff
 
 let addonsEnabled = false;
-const dirContents = Deno.readDir("./backend/");
-for await (const dirEntry of dirContents) {
-    if (dirEntry.isDirectory && dirEntry.name == "addons") {
-        console.log("addons folder found");
-        addonsEnabled = true;
-    }
-}
+const addons: Array<Addon> = [];
 
-if (!addonsEnabled) console.log("addons folder not found");
-
-class Addon {
-
-    fileName: string;
-    path: string | undefined;
-
-    constructor(fileName: string) {
-        this.fileName = fileName;
-        console.log("Creating new addon with filename: " + this.fileName);
-        
-        this.load();
+async function loadAddons() {
+    const dirContents = Deno.readDir("./backend/");
+    for await (const dirEntry of dirContents) {
+        if (dirEntry.isDirectory && dirEntry.name == "addons") {
+            addonsEnabled = true;
+            break;
+        }
     }
 
-    async load() {
-        //try {
-            const addonImport = await import("./addons/" + this.fileName);
+    if (!addonsEnabled) console.log("addons folder not found");
 
-            this.checkRequirements(addonImport);
-
-            this.run = addonImport.run;
-            this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
-            console.log("path: " + this.path);
-        //} catch (_err) {
-        //    console.log("addons don't work");
-        //}
-    }
-
-    private checkRequirements(addonImport: Record<string, unknown>) {
-        const requiredStuff = ["run", "path"];
-
-        for (const name of requiredStuff) {
-            if (typeof addonImport[name] === "undefined") {
-                throw new Error(`function '${name}' not found in ${this.fileName}`);
+    if (addonsEnabled) {
+        const addonsDirectory = "backend/addons/";
+        const addonsFiles = walk("./" + addonsDirectory);
+        for await (const addonsFile of addonsFiles) {
+            if (addonsFile.isFile) {
+                addons.push(new Addon("/" + addonsFile.path.slice(addonsDirectory.length)));
             }
         }
     }
-
-    run(_req: Request): Response | Promise<Response> {
-        console.log("run function not set yet");
-        return new Response("server is being lazy, just wait a sec");
-    }
 }
 
-const addons: Array<Addon> = [];
-if (addonsEnabled) {
-    const addonsDirectory = "backend/addons/";
-    const addonsFiles = walk("./" + addonsDirectory);
-    for await (const addonsFile of addonsFiles) {
-        if (addonsFile.isFile) {
-            addons.push(new Addon("/" + addonsFile.path.slice(addonsDirectory.length)));
-        }
-    }
-}
+loadAddons();
 
 // This function returns the filepath of a file in the website directory
 // It allows html pages to be found without the need to add .html in the URL

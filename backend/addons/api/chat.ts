@@ -1,4 +1,4 @@
-console.log("chat.ts is running");
+console.log("chat.ts loaded");
 
 const messages: Array<string> = [];
 
