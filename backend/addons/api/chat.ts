@@ -18,7 +18,7 @@ export async function run(req: Request): Promise<Response> {
 
         if (messages.unshift(data) > 10) messages.splice(10 - messages.length);
 
-        return new Response("burger", {
+        return new Response("Message accepted", {
             headers: {
                 ...corsHeaders,
             }
@@ -29,6 +29,15 @@ export async function run(req: Request): Promise<Response> {
         return new Response(JSON.stringify(messages), {
             headers: {
                 "Content-Type": "application/json",
+                ...corsHeaders,
+            }
+        });
+    }
+
+    else if (reqMethod == "OPTIONS") {
+        return new Response(null, {
+            headers: {
+                "Allow": "GET, POST, OPTIONS",
                 ...corsHeaders,
             }
         });
