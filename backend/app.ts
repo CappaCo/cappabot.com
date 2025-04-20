@@ -50,7 +50,7 @@ class Addon {
         }
     }
 
-    run(_req: Request): Response {
+    run(_req: Request): Response | Promise<Response> {
         console.log("run function not set yet");
         return new Response("server is being lazy, just wait a sec");
     }
@@ -136,7 +136,7 @@ async function handler(req: Request) {
             const validPaths = [addon.path, addon.path + "/"];
             if (validPaths.includes(reqPath)) {
                 console.log("found: " + addon.path);
-                return addon.run(req);
+                return await addon.run(req);
             }
         }
     }

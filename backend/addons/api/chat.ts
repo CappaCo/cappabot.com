@@ -2,18 +2,26 @@ console.log("chat.ts is running");
 
 const messages: Array<string> = [];
 
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+}
+
 export const path = "/chat";
 
-export function run(req: Request): Response {
+export async function run(req: Request): Promise<Response> {
     const reqMethod = req.method;
 
     if (reqMethod == "POST") {
-        req.text().then((data) => {
-            console.log(data);
+        const data = await req.text();
 
-            if (messages.unshift(data) > 10) messages.splice(10 - messages.length);
+        if (messages.unshift(data) > 10) messages.splice(10 - messages.length);
 
-            return new Response("burger");
+        return new Response("burger", {
+            headers: {
+                ...corsHeaders,
+            }
         });
     }
 
@@ -21,12 +29,14 @@ export function run(req: Request): Response {
         return new Response(JSON.stringify(messages), {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
+                ...corsHeaders,
             }
         });
     }
 
-    return new Response("yeah nah");
+    else {
+        return new Response("Method not allowed", {
+            status: 405,
+        });
+    }
 }
