@@ -3,7 +3,7 @@ const messagesField = document.getElementById("messagesField");
 const sendButton = document.getElementById("sendButton");
 const changeUsernameButton = document.getElementById("changeUsernameButton");
 
-const serverUrl = "/api/chat";
+const serverUrl = "https://cappabot.com/api/chat";
 
 let username = localStorage.getItem("username") || "anon";
 let previousMessages = [];
