@@ -9,10 +9,24 @@
         <meta name="viewport" content="width=device-width">
         <meta name="description" content="CappaChat webview client. Made by CappaBot.">
         <style>
+            body {
+                height: 100vh;
+                width: 100vw;
+            }
+
+            #chatContainer {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                width: 100%;
+                padding: 20px;
+                margin: 0;
+            }
+
             #chatContainer article {
                 flex-direction: column-reverse;
                 display: flex;
-                height: 50vh;
+                flex-grow: 1;
                 overflow-y: auto;
             }
 
@@ -27,6 +41,10 @@
                 flex-direction: row;
             }
 
+            #changeUsernameButton {
+                flex-shrink: 0;
+            }
+
             #inputField {
                 height: auto;
                 margin: 0;
@@ -34,23 +52,21 @@
         </style>
     </head>
     <body>
-        <!-- Main pico container -->
-        <main class="container">
-            <section id="chatContainer">
-                <article aria-busy="true">
-                    <div id="messagesField">
-                        <!-- Messages will appear here -->
-                    </div>
-                </article>
-                <div>
-                    <button id="changeUsernameButton">Change username</button>
-                    <input id="inputField" type="text" placeholder="Type your message...">
-                    <button id="sendButton">Send</button>
+        <section id="chatContainer">
+            <h1>CappaChat in a webview</h1>
+            <article aria-busy="true">
+                <div id="messagesField">
+                    <!-- Messages will appear here -->
                 </div>
-            </section>
+            </article>
+            <div>
+                <button id="changeUsernameButton">Change username</button>
+                <input id="inputField" type="text" placeholder="Type your message...">
+                <button id="sendButton">Send</button>
+            </div>
+        </section>
 
-            <script src="/scripts/chat.js" type="text/javascript"></script>
-        </main>
+        <script src="/scripts/chat.js" type="text/javascript"></script>
         <script src="/scripts/main.js" type="text/javascript"></script>
     </body>
 </html>
