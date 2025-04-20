@@ -18,7 +18,14 @@ export function run(req: Request): Response {
     }
 
     else if (reqMethod == "GET") {
-        return new Response(JSON.stringify(messages));
+        return new Response(JSON.stringify(messages), {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST",
+                "Access-Control-Allow-Headers": "Content-Type",
+            }
+        });
     }
 
     return new Response("yeah nah");

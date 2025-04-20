@@ -40,7 +40,7 @@ class Addon {
         //}
     }
 
-    private checkRequirements(addonImport: any) {
+    private checkRequirements(addonImport: Record<string, unknown>) {
         const requiredStuff = ["run", "path"];
 
         for (const name of requiredStuff) {
