@@ -7,7 +7,7 @@ const changeUsernameButton = document.getElementById("changeUsernameButton");
 
 // Set up WebSocket URL
 const url = "https://cappabot.com/api/chat";
-const wsUrl = url.replace("https://", "ws://").replace("http://", "ws://");
+const wsUrl = url.replace("https://", "wss://").replace("http://", "ws://");
 let socket;
 
 // Ping the server to check if it's running
