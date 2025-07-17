@@ -15,7 +15,7 @@ const corsHeaders = {
     "Access-Control-Allow-Headers": "Content-Type",
 };
 
-export const path = "/api/chat";
+export const path = "/chat";
 
 export async function run(req: Request): Promise<Response> {
     const reqMethod = req.method;
