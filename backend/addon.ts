@@ -15,6 +15,7 @@ export class Addon {
 
         this.run = addonImport.run;
         this.path = this.fileName.split("/").slice(0, -1).join("/") + addonImport.path;
+        console.log(`Addon loaded: ${this.fileName} at path ${this.path}`);
     }
 
     private checkRequirements(addonImport: Record<string, unknown>) {
