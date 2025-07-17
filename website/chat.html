@@ -6,6 +6,8 @@
         <title>Chat - CappaBot</title>
         <!-- Use the pico stylesheet because it looks cool -->
         <link rel="stylesheet" href="/styles/pico.min.css" type="text/css">
+        <!-- Extra stylesheet for chat -->
+        <link rel="stylesheet" href="/styles/chat.css" type="text/css">
         <meta name="viewport" content="width=device-width">
         <meta name="description" content="CappaChat online client. Made by CappaBot.">
     </head>
@@ -20,13 +22,23 @@
             <h2>CappaChat online client</h2>
 
             <section id="chatContainer">
-                <article style="flex-direction: column-reverse; display: flex; height: 50vh; overflow-y: auto;" aria-busy="true">
+                <article style="flex-direction: column-reverse; display: flex; height: 50vh; overflow-y: auto;">
                     <div id="messagesField" style="padding: 10px;">
                         <!-- Messages will appear here -->
+                        <div id="loadingAnimation" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                            <svg width="40" height="40" viewBox="0 0 40 40" aria-label="Loading">
+                                <circle cx="20" cy="20" r="16" stroke="#888" stroke-width="4" fill="none" opacity="0.2"/>
+                                <circle cx="20" cy="20" r="16" stroke="#0078d4" stroke-width="4" fill="none" stroke-linecap="round"
+                                    stroke-dasharray="80" stroke-dashoffset="60">
+                                    <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20"
+                                        dur="1s" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </div>
                     </div>
                 </article>
                 <div style="margin-top: 10px; display: flex; gap: 10px; flex-direction: row;">
-                    <button id="changeUsernameButton">Change username</button>
+                    <button id="changeUsernameButton" style="flex-shrink: 0;">Change username</button>
                     <input id="inputField" type="text" placeholder="Type your message..." style="height: auto; margin: 0;">
                     <button id="sendButton">Send</button>
                 </div>
