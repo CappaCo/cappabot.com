@@ -9,6 +9,8 @@ type ChatMessage = {
 const messages = new Set<ChatMessage>();
 const clients = new Set<WebSocket>();
 
+const messageLimit = 10;
+
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -18,9 +20,13 @@ const corsHeaders = {
 export const path = "/chat";
 
 function addMessage(message: ChatMessage) {
-    console.log("Adding message:", message);
     messages.add(message);
-    console.log("Messages:", messages);
+    while (messages.size > messageLimit) {
+        const oldestMessage = messages.values().next().value;
+        if (oldestMessage) {
+            messages.delete(oldestMessage);
+        }
+    }
     broadcastMessage(message);
 }
 
