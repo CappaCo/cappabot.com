@@ -1,4 +1,5 @@
-console.log("WebSocket chat script loaded.");
+console.log("Chat script loaded.");
+console.log("Use \"enableSanitization = false\" to disable DOMPurify sanitization.");
 
 const inputField = document.getElementById("inputField");
 const messagesField = document.getElementById("messagesField");
@@ -9,6 +10,9 @@ const changeUsernameButton = document.getElementById("changeUsernameButton");
 const url = "/api/chat";
 const wsUrl = url.replace("https://", "wss://").replace("http://", "ws://");
 let socket;
+
+// deno-lint-ignore prefer-const
+let enableSanitization = true; // Enable DOMPurify by default
 
 // Initialize messages set
 const messages = new Set();
@@ -76,7 +80,9 @@ function renderMessages() {
         messagesField.innerHTML = "<em>No messages...</em>";
         return;
     }
-    messagesField.innerHTML = Array.from(messages)
+
+    // Sort messages by timestamp and format them
+    const dirtyMessages = Array.from(messages)
         .sort((a, b) => {
             return a.timestamp - b.timestamp;
         })
@@ -87,6 +93,10 @@ function renderMessages() {
             return `${timestamp} ${user}: ${message}`;
         })
         .join("<br>");
+    
+    // Sanitize the messages to prevent XSS attacks
+    messagesField.innerHTML = enableSanitization ? DOMPurify.sanitize(dirtyMessages) : dirtyMessages;
+    console.log("Removed:", DOMPurify.removed);
 }
 
 function changeUsername() {
