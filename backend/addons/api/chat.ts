@@ -17,6 +17,21 @@ const corsHeaders = {
 
 export const path = "/chat";
 
+function addMessage(message: ChatMessage) {
+    console.log("Adding message:", message);
+    messages.add(message);
+    console.log("Messages:", messages);
+    broadcastMessage(message);
+}
+
+function broadcastMessage(message: ChatMessage) {
+    for (const client of clients) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(message));
+        }
+    }
+}
+
 export async function run(req: Request): Promise<Response> {
     const reqMethod = req.method;
 
@@ -39,23 +54,7 @@ export async function run(req: Request): Promise<Response> {
                 message: json.message || "",
             };
 
-            messages.add(message);
-
-            if (messages.size > 10) {
-                const oldest = messages.values().next().value;
-                if (oldest) {
-                    messages.delete(oldest);
-                }
-            }
-
-            // Broadcast to all clients
-            console.log(clients)
-            for (const client of clients) {
-                if (client.readyState === WebSocket.OPEN) {
-                    console.log("Broadcasting message to client");
-                    client.send(JSON.stringify(message));
-                }
-            }
+            addMessage(message);
         };
 
         socket.onclose = () => {
@@ -102,12 +101,7 @@ export async function run(req: Request): Promise<Response> {
         }
 
         if (message) {
-            messages.add(message);
-            // Keep only the latest 10 messages
-            while (messages.size > 10) {
-                const oldest = messages.values().next().value;
-                if (oldest) messages.delete(oldest);
-            }
+            addMessage(message);
         }
 
         return new Response(responseMessage, {

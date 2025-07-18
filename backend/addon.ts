@@ -39,6 +39,7 @@ export class Addon {
         return false;
     }
 
+    // deno-lint-ignore no-explicit-any
     run(..._params: any[]): Response | any | Promise<Response | any> {
         console.log("run function not set yet");
         return new Response("server is being lazy, just wait a sec");

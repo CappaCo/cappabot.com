@@ -6,46 +6,31 @@ const sendButton = document.getElementById("sendButton");
 const changeUsernameButton = document.getElementById("changeUsernameButton");
 
 // Set up WebSocket URL
-const url = "https://cappabot.com/api/chat";
+const url = "/api/chat";
 const wsUrl = url.replace("https://", "wss://").replace("http://", "ws://");
 let socket;
-
-// Ping the server to check if it's running
-fetch(url)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Server is not running or WebSocket URL is incorrect.");
-        }
-        console.log("WebSocket server is running.");
-    })
-    .catch(error => {
-        console.error("Error connecting to WebSocket server:", error);
-        alert("WebSocket server is not running. Please start the server.");
-    });
 
 // Initialize messages set
 const messages = new Set();
 
 let username = localStorage.getItem("username") || "anon";
 
-function initializeChat() {
+async function initializeChat() {
     // Get messages from server
-    return fetch(url, { headers: { "Accept": "application/json" } }).then(response => {
+    try {
+        const response = await fetch(url, { headers: { "Accept": "application/json" } });
         if (!response.ok) {
             throw new Error("Failed to fetch messages from server.");
         }
-        return response.json();
-    }).then(data => {
-        console.log("Fetched messages:", data);
+        const data = await response.json();
         data.forEach(msg => {
-            console.log("Adding message:", msg);
             messages.add(msg);
         });
         renderMessages();
-    }).catch(error => {
+    } catch (error) {
         console.error("Error fetching messages:", error);
         alert("Failed to load messages. Please check the server.");
-    });
+    }
 }
 
 function connectWebSocket() {
@@ -123,7 +108,7 @@ sendButton.addEventListener("click", sendMessage);
 changeUsernameButton.addEventListener("click", changeUsername);
 
 // Initialize chat
-initializeChat().then(() => {
+initializeChat().then(
     // Connect to WebSocket after initial messages are loaded
-    connectWebSocket();
-});
+    connectWebSocket
+);
