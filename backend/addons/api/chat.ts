@@ -118,7 +118,8 @@ export async function run(req: Request): Promise<Response> {
             responseJSON = Array.from(messages).sort((a, b) => a.timestamp - b.timestamp);
         } else {
             responseJSON = Array.from(messages).sort((a, b) => a.timestamp - b.timestamp)
-                .map(msg => `${msg.user}: ${msg.message}`);
+                .map(msg => `${msg.user}: ${msg.message}`)
+                .reverse(); // Reverse to show latest messages first
         }
         return new Response(JSON.stringify(responseJSON), {
             headers: {
