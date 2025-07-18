@@ -49,11 +49,9 @@ export async function run(req: Request): Promise<Response> {
             }
 
             // Broadcast to all clients
-            console.log("Broadcasting message to clients");
             console.log(clients)
             for (const client of clients) {
-                console.log("Checking client:", client);
-                if (client !== socket && client.readyState === WebSocket.OPEN) {
+                if (client.readyState === WebSocket.OPEN) {
                     console.log("Broadcasting message to client");
                     client.send(JSON.stringify(message));
                 }
@@ -118,8 +116,17 @@ export async function run(req: Request): Promise<Response> {
             }
         });
     } else if (reqMethod == "GET") {
-        const messagesArray = Array.from(messages).sort((a, b) => a.timestamp - b.timestamp);
-        return new Response(JSON.stringify(messagesArray), {
+        // Check header for if the request wants json or text
+        const acceptHeader = req.headers.get("accept") || "";
+        let responseJSON;
+        console.log("Accept header:", acceptHeader);
+        if (acceptHeader.includes("application/json")) {
+            responseJSON = Array.from(messages).sort((a, b) => a.timestamp - b.timestamp);
+        } else {
+            responseJSON = Array.from(messages).sort((a, b) => a.timestamp - b.timestamp)
+                .map(msg => `${msg.user}: ${msg.message}`);
+        }
+        return new Response(JSON.stringify(responseJSON), {
             headers: {
                 "Content-Type": "application/json",
                 ...corsHeaders,

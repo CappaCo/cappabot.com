@@ -30,14 +30,16 @@ let username = localStorage.getItem("username") || "anon";
 
 function initializeChat() {
     // Get messages from server
-    return fetch(url).then(response => {
+    return fetch(url, { headers: { "Accept": "application/json" } }).then(response => {
         if (!response.ok) {
             throw new Error("Failed to fetch messages from server.");
         }
         return response.json();
     }).then(data => {
+        console.log("Fetched messages:", data);
         data.forEach(msg => {
-            messages.add(JSON.stringify(msg));
+            console.log("Adding message:", msg);
+            messages.add(msg);
         });
         renderMessages();
     }).catch(error => {
@@ -54,14 +56,14 @@ function connectWebSocket() {
     };
 
     socket.onmessage = (event) => {
-        const json = event.data;
-        messages.add(json);
+        const message = JSON.parse(event.data);
+        messages.add(message);
         renderMessages();
     };
 
     socket.onclose = () => {
-        console.warn("WebSocket disconnected. Reconnecting in 2s...");
-        setTimeout(connectWebSocket, 2000);
+        console.warn("WebSocket disconnected. Reconnecting in 3s...");
+        setTimeout(connectWebSocket, 3000);
     };
 
     socket.onerror = (err) => {
@@ -81,10 +83,6 @@ function sendMessage() {
 
     socket.send(fullMessage);
 
-    // Show your own message immediately
-    messages.add(fullMessage);
-    renderMessages();
-
     inputField.value = "";
 }
 
@@ -95,15 +93,12 @@ function renderMessages() {
     }
     messagesField.innerHTML = Array.from(messages)
         .sort((a, b) => {
-            const aTime = JSON.parse(a).timestamp;
-            const bTime = JSON.parse(b).timestamp;
-            return aTime - bTime;
+            return a.timestamp - b.timestamp;
         })
         .map((msg) => {
-            const parsedMsg = JSON.parse(msg);
-            const timestamp = `<span class="timestamp">(${new Date(parsedMsg.timestamp).toLocaleTimeString()})</span>`;
-            const user = `<strong>${parsedMsg.user}</strong>`;
-            const message = parsedMsg.message;
+            const timestamp = `<span class="timestamp">(${new Date(msg.timestamp).toLocaleTimeString()})</span>`;
+            const user = `<strong>${msg.user}</strong>`;
+            const message = msg.message;
             return `${timestamp} ${user}: ${message}`;
         })
         .join("<br>");
