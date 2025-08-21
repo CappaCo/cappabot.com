@@ -7,6 +7,15 @@ MathJax = {
 
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
+const selectedOptions = {
+    "numQuestions": 0,
+    "timePerQuestion": 0,
+    "operation": "",
+    "sets": {
+        
+    },
+};
+
 // Generate the sets
 function numberRange(min, max) {
     // Generate an array of numbers from min to max (inclusive)
@@ -35,7 +44,7 @@ function updateEstimatedTime() {
     const numQuestions = parseInt(numQuestionsInput.value);
     const timePerQuestion = parseInt(timePerQuestionInput.value);
     const estimatedTime = numQuestions * timePerQuestion;
-    estimatedTimeDisplay.textContent = estimatedTime;
+    estimatedTimeDisplay.textContent = (isNaN(estimatedTime)) ? "..." : estimatedTime;
 }
 
 updateEstimatedTime();
@@ -80,16 +89,19 @@ function showSetSelection() {
             const input = document.createElement("input");
             const label = document.createElement("label");
 
+            const id = `var-${i}-${setName}`;
+
             input.type = "radio";
             input.name = `var-${i}`;
             input.value = setName;
-            input.id = `var-${i}-${setName}`
+            input.id = id;
             if (setIndex === 0) input.checked = true;
 
-            label.for = input.id;
+            td.appendChild(input);
+
+            label.setAttribute("for", id);
             label.innerText = setName;
 
-            td.appendChild(input);
             td.appendChild(label);
             row.appendChild(td);
         }
@@ -99,6 +111,21 @@ function showSetSelection() {
 }
 
 showSetSelection();
+
+setSelectTable.querySelectorAll("input[type='radio']").forEach((el) => {
+    el.addEventListener("change", (event) => {
+        setSelectionChange(event.target);
+    });
+});
+
+function setSelectionChange(e) {
+    console.log(e);
+    const [_, variable, set] = e.id.split("-");
+    selectedOptions.sets[variable] = sets[set];
+}
+
+// Update selected sets with the defaults
+setSelectTable.querySelectorAll("tbody > tr:first-child > td > input[type='radio']").forEach(setSelectionChange);
 
 // Show what's in the sets
 const setPreviewTable = document.getElementById("setPreviewTable");
