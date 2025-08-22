@@ -36,8 +36,10 @@ const setSelectTable = document.getElementById("setSelectTable");
 
 const setPreviewTable = document.getElementById("setPreviewTable");
 
-const selectedOptionsTable = document.getElementById("selectedOptionsTable");
+const selectedOptionsDisplay = document.getElementById("selectedOptionsDisplay");
 const selectedSetTable = document.getElementById("selectedSetTable");
+
+document.getElementById("generateButton").addEventListener("click", generate);
 
 function optionsUpdated() {
     displaySelectedOptions();
@@ -170,6 +172,8 @@ function showSetSelection() {
 }
 
 function updateSelectedSets() {
+    for (const key in options.sets) { delete options.sets[key] }
+    
     // Update selected sets with the defaults
     setSelectTable.querySelectorAll("input[type='radio']:checked").forEach((e) => {
         const [_, variable, set] = e.id.split("-");
@@ -197,14 +201,14 @@ function showSets() {
 
 // Display current selected options
 function displaySelectedOptions() {
-    selectedOptionsTable.innerHTML = `
+    selectedOptionsDisplay.innerHTML = `
         <strong>Number of Questions:</strong> ${options.numQuestions} <br>
         <strong>Time per Question:</strong> ${options.timePerQuestion} seconds <br>
         <strong>Question:</strong> ${options.question.replace("$$", "$i$")} <br>
         <strong>Answer:</strong> ${options.answer} <br>
     `;
 
-    MathJax.typeset([selectedOptionsTable]);
+    MathJax.typeset([selectedOptionsDisplay]);
 
     selectedSetTable.innerHTML = "";
 
@@ -222,6 +226,11 @@ function displaySelectedOptions() {
     }
 
     MathJax.typeset([selectedSetTable]);
+}
+
+function generate() {
+    console.log("Generating with options:", options);
+    alert("Work in progress...");
 }
 
 // Util

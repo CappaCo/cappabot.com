@@ -25,10 +25,10 @@
             <label for="timePerQuestion"><h3>Seconds per question</h3></label>
             <input type="number" id="timePerQuestion" value="5" min="0" max="300">
 
-            <span>Estimated time: <span id="estimatedTime">...</span> seconds</span>
+            <p>Estimated time: <span id="estimatedTime">...</span> seconds</p>
 
             <h3>Question</h3>
-            <small>$i$n_1, n_2$$... are numbers randomly picked from the numbers set</small>
+            <p>$i$n_1, n_2$$... are numbers randomly picked from the numbers set</p>
             <div>
                 <input type="radio" name="operation" data-question="$$n_1 + n_2$$" value="${num1+num2}" id="op-add" checked>
                 <label for="op-add">$$n_1 + n_2$$</label>
@@ -91,7 +91,7 @@
             </table>
 
             <h3>Selected options</h3>
-            <span id="selectedOptionsTable">...</span>
+            <span id="selectedOptionsDisplay">...</span>
 
             <h4>Selected sets</h4>
             <table>
@@ -109,6 +109,8 @@
                     </tr>
                 </tbody>
             </table>
+
+            <button id="generateButton">Generate!</button>
             
             <footer>
                 Made by CappaBot<br>
