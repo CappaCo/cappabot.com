@@ -5,7 +5,7 @@ const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""
 let variableHeaders = [];
 const requiredVariables = new Set();
 
-const selectedOptions = makeProxy({
+const options = makeProxy({
     numQuestions: 0,
     timePerQuestion: 0,
     question: "",
@@ -36,7 +36,8 @@ const setSelectTable = document.getElementById("setSelectTable");
 
 const setPreviewTable = document.getElementById("setPreviewTable");
 
-const selectedOptionsDisplay = document.getElementById("selectedOptionsDisplay");
+const selectedOptionsTable = document.getElementById("selectedOptionsTable");
+const selectedSetTable = document.getElementById("selectedSetTable");
 
 function optionsUpdated() {
     displaySelectedOptions();
@@ -52,13 +53,13 @@ function init() {
 // Add event listeners to update the estimated time when inputs change
 numQuestionsInput.addEventListener("input", function updateNumQuestions() {
     numQuestionsInput.setAttribute("aria-invalid", checkValidNumber(numQuestionsInput.value, 1) ? "" : "true");
-    selectedOptions.numQuestions = Number(numQuestionsInput.value);
+    options.numQuestions = Number(numQuestionsInput.value);
     updateEstimatedTime();
 });
 
 timePerQuestionInput.addEventListener("input", function updateTimePerQuestion() {
     timePerQuestionInput.setAttribute("aria-invalid", checkValidNumber(timePerQuestionInput.value, 0.1, 300) ? "" : "true");
-    selectedOptions.timePerQuestion = Number(timePerQuestionInput.value);
+    options.timePerQuestion = Number(timePerQuestionInput.value);
     updateEstimatedTime();
 });
 
@@ -95,10 +96,10 @@ function updateSelectedOperation() {
 
     const value = checkedRadio.value;
     const question = (value === "custom") ? customOperationQuestion.value : checkedRadio.dataset.question;
-    selectedOptions.question = question;
+    options.question = question;
 
     const answer = (value === "custom") ? customOperationAnswer.value : value;
-    selectedOptions.answer = answer;
+    options.answer = answer;
 
     updateRequiredVariables();
 }
@@ -107,7 +108,7 @@ function updateRequiredVariables() {
     requiredVariables.clear();
 
     const regex = /num\d+/gm;
-    let matches = selectedOptions.answer.match(regex);
+    let matches = options.answer.match(regex);
     if (!matches) matches = [];
     matches.forEach(match => { requiredVariables.add(match); });
 
@@ -125,7 +126,7 @@ function showSetSelection() {
 
     variableHeaders.forEach(headerText => {
         const th = document.createElement("th");
-        th.textContent = headerText.replace("num", "$i$n_{") + "}$$";
+        th.textContent = varToMath(headerText);
         headerRow.appendChild(th);
     });
     header.appendChild(headerRow);
@@ -172,7 +173,7 @@ function updateSelectedSets() {
     // Update selected sets with the defaults
     setSelectTable.querySelectorAll("input[type='radio']:checked").forEach((e) => {
         const [_, variable, set] = e.id.split("-");
-        selectedOptions.sets[variable] = sets[set];
+        options.sets[variable] = sets[set];
     });
 }
 
@@ -196,13 +197,31 @@ function showSets() {
 
 // Display current selected options
 function displaySelectedOptions() {
-    selectedOptionsDisplay.innerHTML = `
-        <strong>Number of Questions:</strong> ${selectedOptions.numQuestions} <br>
-        <strong>Time per Question:</strong> ${selectedOptions.timePerQuestion} seconds <br>
-        <strong>Question:</strong> ${selectedOptions.question} <br>
-        <strong>Answer:</strong> ${selectedOptions.answer} <br>
-        <strong>Sets:</strong> ${JSON.stringify(selectedOptions.sets)} <br>
+    selectedOptionsTable.innerHTML = `
+        <strong>Number of Questions:</strong> ${options.numQuestions} <br>
+        <strong>Time per Question:</strong> ${options.timePerQuestion} seconds <br>
+        <strong>Question:</strong> ${options.question.replace("$$", "$i$")} <br>
+        <strong>Answer:</strong> ${options.answer} <br>
     `;
+
+    MathJax.typeset([selectedOptionsTable]);
+
+    selectedSetTable.innerHTML = "";
+
+    for (const [setName, setValues] of Object.entries(options.sets)) {
+        const row = document.createElement("tr");
+        const setCell = document.createElement("td");
+        setCell.textContent = varToMath(setName);
+        row.appendChild(setCell);
+
+        const valuesCell = document.createElement("td");
+        valuesCell.textContent = setValues.join(", ");
+        row.appendChild(valuesCell);
+
+        selectedSetTable.appendChild(row);
+    }
+
+    MathJax.typeset([selectedSetTable]);
 }
 
 // Util
@@ -228,6 +247,10 @@ function numberRange(min, max) {
 function checkValidNumber(value, min = 0, max = 100) {
     const parsedValue = parseFloat(value);
     return (!isNaN(value) && value.trim() !== "" && min <= parsedValue && parsedValue <= max);
+}
+
+function varToMath(name) {
+    return name.replace("num", "$i$n_{") + "}$$";
 }
 
 // Init
