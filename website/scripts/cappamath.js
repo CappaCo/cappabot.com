@@ -16,6 +16,8 @@ const selectedOptions = {
     },
 };
 
+const requiredSets = new Set();
+
 // Generate the sets
 function numberRange(min, max) {
     // Generate an array of numbers from min to max (inclusive)
@@ -51,6 +53,8 @@ updateEstimatedTime();
 
 // Custom operation input handling
 const customOperationInput = document.getElementById("customOperation");
+const customOperationQuestion = document.getElementById("customOperationQuestion");
+const customOperationAnswer = document.getElementById("customOperationAnswer");
 const operationRadios = document.querySelectorAll("input[name='operation']");
 
 // Make the custom operation input visible when the custom radio button is selected
@@ -61,8 +65,32 @@ operationRadios.forEach(radio => {
         } else {
             customOperationInput.style.display = "none";
         }
+
+        updateSelectedOperation();
     });
 });
+
+customOperationAnswer.addEventListener("keypress", (e) => {
+    updateSelectedOperation();
+})
+
+function updateSelectedOperation() {
+    let operation = [...operationRadios].filter(el => el.checked)[0].value;
+    if (operation === "custom") operation = customOperationAnswer.value;
+    selectedOptions.operation = operation;
+    updateRequiredSets();
+}
+
+function updateRequiredSets() {
+    requiredSets.clear();
+
+    const regex = "num\\d+";
+    const matches = selectedOptions.operation.match(regex);
+    console.log("matches:", matches);
+    if (!matches) return;
+    requiredSets.add(...matches);
+    console.log(requiredSets);
+}
 
 // Generate selection inputs based on the sets
 const setSelectTable = document.getElementById("setSelectTable");
@@ -112,10 +140,14 @@ function showSetSelection() {
 
 showSetSelection();
 
-setSelectTable.querySelectorAll("input[type='radio']").forEach((el) => {
-    el.addEventListener("change", (event) => {
-        setSelectionChange(event.target);
+function updateSetSelection() {
+    setSelectTable.querySelectorAll("input[type='radio']").forEach((el) => {
+
     });
+}
+
+setSelectTable.querySelectorAll("input[type='radio']").forEach((el) => {
+    el.addEventListener("change", getSelectedSets);
 });
 
 function setSelectionChange(e) {
@@ -124,8 +156,10 @@ function setSelectionChange(e) {
     selectedOptions.sets[variable] = sets[set];
 }
 
-// Update selected sets with the defaults
-setSelectTable.querySelectorAll("tbody > tr:first-child > td > input[type='radio']").forEach(setSelectionChange);
+function getSelectedSets() {
+    // Update selected sets with the defaults
+    setSelectTable.querySelectorAll("input[type='radio']:checked").forEach(setSelectionChange);
+}
 
 // Show what's in the sets
 const setPreviewTable = document.getElementById("setPreviewTable");
