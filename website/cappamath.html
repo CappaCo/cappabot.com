@@ -20,17 +20,17 @@
             <h2>CappaMath</h2>
 
             <label for="numQuestions"><h3>Number of questions</h3></label>
-            <input type="number" id="numQuestions" value="10" min="1" max="100">
+            <input type="number" id="numQuestions" min="1" max="100">
 
             <label for="timePerQuestion"><h3>Seconds per question</h3></label>
-            <input type="number" id="timePerQuestion" value="5" min="0" max="300">
+            <input type="number" id="timePerQuestion" min="0" max="300">
 
             <p>Estimated time: <span id="estimatedTime">...</span> seconds</p>
 
             <h3>Question</h3>
             <p>$i$n_1, n_2$$... are numbers randomly picked from the numbers set</p>
             <div>
-                <input type="radio" name="operation" data-question="$$n_1 + n_2$$" value="${num1+num2}" id="op-add" checked>
+                <input type="radio" name="operation" data-question="$$n_1 + n_2$$" value="${num1+num2}" id="op-add">
                 <label for="op-add">$$n_1 + n_2$$</label>
 
                 <input type="radio" name="operation" data-question="$$n_1 - n_2$$" value="${num1-num2}" id="op-sub">
@@ -45,7 +45,7 @@
                 <input type="radio" name="operation" data-question="$${n_1}x^{n_3} \times {n_2}x^{n_4}$$" value="${num1*num2}x^{num3+num4}" id="op-algebra">
                 <label for="op-algebra">$${n_1}x^{n_3} \times {n_2}x^{n_4}$$</label>
 
-                <input type="radio" name="operation" value="custom" id="op-custom">
+                <input type="radio" name="operation" data-question="" value="" id="op-custom">
                 <label for="op-custom">Custom</label>
             </div>
 
@@ -111,6 +111,9 @@
             </table>
 
             <button id="generateButton">Generate!</button>
+            <button id="shareButton" class="secondary">Share</button><a id="shareLinkDisplay"></a>
+            <br>
+            <button id="resetButton" class="outline secondary">Reset options</button>
             
             <footer>
                 Made by CappaBot<br>

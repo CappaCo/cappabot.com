@@ -1,31 +1,12 @@
 console.log("cappamath.js running");
 
-const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-let variableHeaders = [];
-const requiredVariables = new Set();
-
-const options = makeProxy({
-    numQuestions: 0,
-    timePerQuestion: 0,
-    question: "",
-    answer: "",
-    sets: makeProxy({}, optionsUpdated),
-}, optionsUpdated);
-
-// Generate the sets
-const sets = {
-    "1": numberRange(10), // 1 through 10
-    "2": numberRange(13), // 1 through 13
-    "3": numberRange(5), // 1 through 5
-}
-
 // Get document elements
 const numQuestionsInput = document.getElementById("numQuestions");
 const timePerQuestionInput = document.getElementById("timePerQuestion");
 const estimatedTimeDisplay = document.getElementById("estimatedTime");
 
 const operationRadios = document.querySelectorAll("input[name='operation']");
+const customQuestionRadioButton = document.getElementById("op-custom");
 
 const customOperationInput = document.getElementById("customOperation");
 const customOperationQuestion = document.getElementById("customOperationQuestion");
@@ -39,15 +20,67 @@ const setPreviewTable = document.getElementById("setPreviewTable");
 const selectedOptionsDisplay = document.getElementById("selectedOptionsDisplay");
 const selectedSetTable = document.getElementById("selectedSetTable");
 
+const shareLinkDisplay = document.getElementById("shareLinkDisplay");
 document.getElementById("generateButton").addEventListener("click", generate);
+document.getElementById("shareButton").addEventListener("click", share);
+document.getElementById("resetButton").addEventListener("click", reset);
+
+const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+let variableHeaders = [];
+const requiredVariables = new Set();
+
+const defaultOptions = {
+    numQuestions: 10,
+    timePerQuestion: 5,
+    operation: "op-add",
+    question: "$$n_1 + n_2$$",
+    answer: "${num1+num2}",
+    selectedSets: {
+        "num1": "1",
+        "num2": "1",
+        "num3": "1",
+        "num4": "1",
+    },
+    sets: {
+        "1": numberRange(10), // 1 through 10
+        "2": numberRange(13), // 1 through 13
+        "3": numberRange(5), // 1 through 5
+    },
+}
+const storageOptions = JSON.parse(localStorage.getItem("options"));
+const optionsRaw = compareObjectKeys(storageOptions, defaultOptions) ? storageOptions : defaultOptions;
+let options = makeOptionsProxy(optionsRaw);
+
+function makeOptionsProxy(raw) {
+    raw.sets = makeProxy(raw.sets, optionsUpdated);
+    raw.selectedSets = makeProxy(raw.selectedSets, optionsUpdated);
+    const proxy = makeProxy(raw, optionsUpdated);
+    return proxy;
+}
 
 function optionsUpdated() {
+    localStorage.setItem("options", JSON.stringify(options));
     displaySelectedOptions();
 }
 
 function init() {
+    numQuestionsInput.value = options.numQuestions;
     numQuestionsInput.dispatchEvent(new Event("input"));
+    timePerQuestionInput.value = options.timePerQuestion;
     timePerQuestionInput.dispatchEvent(new Event("input"));
+    for (const el of operationRadios) {
+        if (el.id == options.operation) {
+            el.checked = true;
+            if (el == customQuestionRadioButton) {
+                customOperationQuestion.value = options.question;
+                customOperationAnswer.value = options.answer;
+                customOperationQuestion.dispatchEvent(new Event("input"));
+                customOperationAnswer.dispatchEvent(new Event("input"));
+            }
+            break;
+        }
+    }
     updateSelectedOperation();
     showSets();
 }
@@ -80,28 +113,30 @@ operationRadios.forEach(radio => {
 customOperationQuestion.addEventListener("input", (e) => {
     customOperationPreview.textContent = customOperationQuestion.value;
     MathJax.typeset([customOperationPreview]);
+
+    customQuestionRadioButton.dataset.question = customOperationQuestion.value || "";
+
     updateSelectedOperation();
 });
 
 customOperationAnswer.addEventListener("input", (e) => {
+    customQuestionRadioButton.value = customOperationAnswer.value || "";
+
     updateSelectedOperation();
 });
 
 function updateSelectedOperation() {
     const checkedRadio = [...operationRadios].filter(el => el.checked)[0];
 
-    if (checkedRadio.value === "custom") {
+    if (checkedRadio.id === "op-custom") {
         customOperationInput.style.display = "block";
     } else {
         customOperationInput.style.display = "none";
     }
 
-    const value = checkedRadio.value;
-    const question = (value === "custom") ? customOperationQuestion.value : checkedRadio.dataset.question;
-    options.question = question;
-
-    const answer = (value === "custom") ? customOperationAnswer.value : value;
-    options.answer = answer;
+    options.operation = checkedRadio.id;
+    options.question = checkedRadio.dataset.question;
+    options.answer = checkedRadio.value;
 
     updateRequiredVariables();
 }
@@ -135,7 +170,7 @@ function showSetSelection() {
     setSelectTable.appendChild(header);
 
     const body = document.createElement("tbody");
-    for (const [setIndex, [setName]] of Object.entries(sets).entries()) {
+    for (const [setName] of Object.entries(options.sets)) {
         const row = document.createElement("tr");
         for (const i of variableHeaders) {
             const td = document.createElement("td");
@@ -148,7 +183,7 @@ function showSetSelection() {
             input.name = `var-${i}`;
             input.value = setName;
             input.id = id;
-            if (setIndex === 0) input.checked = true;
+            if (setName == options.selectedSets[i]) input.checked = true;
 
             td.appendChild(input);
 
@@ -172,12 +207,12 @@ function showSetSelection() {
 }
 
 function updateSelectedSets() {
-    for (const key in options.sets) { delete options.sets[key] }
+    //for (const key in options.sets) { delete options.sets[key] }
     
     // Update selected sets with the defaults
     setSelectTable.querySelectorAll("input[type='radio']:checked").forEach((e) => {
         const [_, variable, set] = e.id.split("-");
-        options.sets[variable] = sets[set];
+        options.selectedSets[variable] = set;
     });
 }
 
@@ -185,7 +220,7 @@ function updateSelectedSets() {
 function showSets() {
     setPreviewTable.innerHTML = ""; // Clear previous content
 
-    for (const [setName, setValues] of Object.entries(sets)) {
+    for (const [setName, setValues] of Object.entries(options.sets)) {
         const row = document.createElement("tr");
         const setCell = document.createElement("td");
         setCell.textContent = setName;
@@ -205,21 +240,20 @@ function displaySelectedOptions() {
         <strong>Number of Questions:</strong> ${options.numQuestions} <br>
         <strong>Time per Question:</strong> ${options.timePerQuestion} seconds <br>
         <strong>Question:</strong> ${options.question.replace("$$", "$i$")} <br>
-        <strong>Answer:</strong> ${options.answer} <br>
     `;
 
     MathJax.typeset([selectedOptionsDisplay]);
 
     selectedSetTable.innerHTML = "";
 
-    for (const [setName, setValues] of Object.entries(options.sets)) {
+    for (const [setName, setValue] of Object.entries(options.selectedSets).filter(name => variableHeaders.includes(name[0]))) {
         const row = document.createElement("tr");
         const setCell = document.createElement("td");
         setCell.textContent = varToMath(setName);
         row.appendChild(setCell);
 
         const valuesCell = document.createElement("td");
-        valuesCell.textContent = setValues.join(", ");
+        valuesCell.textContent = options.sets[setValue].join(", ");
         row.appendChild(valuesCell);
 
         selectedSetTable.appendChild(row);
@@ -228,9 +262,29 @@ function displaySelectedOptions() {
     MathJax.typeset([selectedSetTable]);
 }
 
+// Generate the actual page that does the thing
 function generate() {
     console.log("Generating with options:", options);
-    alert("Work in progress...");
+    window.open("/cappamath-run");
+}
+
+// Share the options as a link
+function share() {
+    console.log("Sharing with options:", options);
+    const params = encodeURIComponent(JSON.stringify(options));
+    const link = window.location + `-run?options=${params}`;
+    shareLinkDisplay.href = link;
+    shareLinkDisplay.innerText = link;
+    navigator.clipboard.writeText(link)
+        .then(() => {
+            alert("Copied to clipboard");
+        });
+}
+
+// Reset the options
+function reset() {
+    options = makeOptionsProxy(defaultOptions);
+    init();
 }
 
 // Util
@@ -260,6 +314,15 @@ function checkValidNumber(value, min = 0, max = 100) {
 
 function varToMath(name) {
     return name.replace("num", "$i$n_{") + "}$$";
+}
+
+function compareObjectKeys(obj1, obj2) {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    
+    if (keys1.length !== keys2.length) return false;
+    
+    return keys1.every(key => obj2.hasOwnProperty(key));
 }
 
 // Init
