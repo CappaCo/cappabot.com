@@ -16,6 +16,9 @@ const customOperationPreview = document.getElementById("customOperationPreview")
 const setSelectTable = document.getElementById("setSelectTable");
 
 const setPreviewTable = document.getElementById("setPreviewTable");
+const customSetNameInput = document.getElementById("customSetNameInput");
+const customSetDataInput = document.getElementById("customSetDataInput");
+const customSetAddButton = document.getElementById("customSetAddButton");
 
 const selectedOptionsDisplay = document.getElementById("selectedOptionsDisplay");
 const selectedSetTable = document.getElementById("selectedSetTable");
@@ -234,6 +237,22 @@ function showSets() {
     }
 }
 
+customSetAddButton.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    const customSetName = customSetNameInput.value.trim();
+    const dataValue = customSetDataInput.value.trim();
+    if (dataValue) {
+        const customSetData = dataValue.split(/[,\s]+/).map(Number);
+        options.sets[customSetName] = customSetData;
+    } else {
+        delete options.sets[customSetName];
+    }
+
+    showSetSelection();
+    showSets();
+});
+
 // Display current selected options
 function displaySelectedOptions() {
     selectedOptionsDisplay.innerHTML = `
@@ -253,7 +272,14 @@ function displaySelectedOptions() {
         row.appendChild(setCell);
 
         const valuesCell = document.createElement("td");
-        valuesCell.textContent = options.sets[setValue].join(", ");
+        const value = options.sets[setValue];
+        if (!value) {
+            options.selectedSets[setName] = Object.entries(options.sets)[0][0];
+            console.log("run it back");
+            showSetSelection();
+            return;
+        }
+        valuesCell.textContent = value.join(", ");
         row.appendChild(valuesCell);
 
         selectedSetTable.appendChild(row);
