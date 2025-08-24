@@ -52,7 +52,7 @@ const defaultOptions = {
     },
 }
 const storageOptions = JSON.parse(localStorage.getItem("options"));
-const optionsRaw = compareObjectKeys(storageOptions, defaultOptions) ? storageOptions : defaultOptions;
+const optionsRaw = compareObjectKeys(storageOptions, defaultOptions) ? storageOptions : {...defaultOptions};
 let options = makeOptionsProxy(optionsRaw);
 
 function makeOptionsProxy(raw) {
@@ -68,6 +68,7 @@ function optionsUpdated() {
 }
 
 function init() {
+    console.log("running init");
     numQuestionsInput.value = options.numQuestions;
     numQuestionsInput.dispatchEvent(new Event("input"));
     timePerQuestionInput.value = options.timePerQuestion;
@@ -309,7 +310,9 @@ function share() {
 
 // Reset the options
 function reset() {
+    console.log("resetting");
     options = makeOptionsProxy(defaultOptions);
+    optionsUpdated();
     init();
 }
 
