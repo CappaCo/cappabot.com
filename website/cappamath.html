@@ -29,32 +29,26 @@
 
             <h3>Question</h3>
             <p>$i$n_1, n_2$$... are numbers randomly picked from the numbers set</p>
-            <div>
+            <div id="operationSelectButtons">
                 <input type="radio" name="operation" data-question="$$n_1 + n_2$$" value="${num1+num2}" id="op-add">
                 <label for="op-add">$$n_1 + n_2$$</label>
-
-                <input type="radio" name="operation" data-question="$$n_1 - n_2$$" value="${num1-num2}" id="op-sub">
-                <label for="op-sub">$$n_1 - n_2$$</label>
-
-                <input type="radio" name="operation" data-question="$$n_1 \times n_2$$" value="${num1*num2}" id="op-mul">
-                <label for="op-mul">$$n_1 \times n_2$$</label>
-
-                <input type="radio" name="operation" data-question="$$n_1 \div n_2$$" value="${num1/num2}" id="op-div">
-                <label for="op-div">$$n_1 \div n_2$$</label>
-
-                <input type="radio" name="operation" data-question="$${n_1}x^{n_3} \times {n_2}x^{n_4}$$" value="${num1*num2}x^{num3+num4}" id="op-algebra">
-                <label for="op-algebra">$${n_1}x^{n_3} \times {n_2}x^{n_4}$$</label>
-
-                <input type="radio" name="operation" data-question="" value="" id="op-custom">
-                <label for="op-custom">Custom</label>
             </div>
-
-            <div id="customOperation" style="display: none;">
-                <input type="text" id="customOperationQuestion" placeholder="Custom question e.g. $$n_1x + n_2x$$">
+            <details>
+                <summary>Make a custom operation</summary>
+                <div class="grid" style="grid-template-columns: 2fr 4fr 4fr 1fr">
+                    <label for="customOperationNameInput">Name</label>
+                    <label for="customOperationQuestionInput">Question</label>
+                    <label for="customOperationAnswerInput">Answer</label>
+                    <span></span>
+                    <input id="customOperationNameInput" type="text" placeholder="custom">
+                    <input id="customOperationQuestionInput" type="text" placeholder="$$n_1x + n_2x$$">
+                    <input id="customOperationAnswerInput" type="text" placeholder="${num1+num2}x">
+                    <input id="customOperationAddButton" type="button" value="Add">
+                </div>
                 <span>Preview: </span><span id="customOperationPreview">...</span>
-                <input type="text" id="customOperationAnswer" placeholder="Custom answer e.g. ${num1 + num2}x">
+                <br>
                 <small>Ask Casper how to use this feature</small>
-            </div>
+            </details>
 
             <h3>Choose what set your variables should choose from</h3>
             <table id="setSelectTable">
@@ -89,14 +83,17 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="grid" style="grid-template-columns: 2fr 4fr 1fr">
-                <label for="customSetNameInput">Custom set name</label>
-                <label for="customSetDataInput">Custom set data</label>
-                <span></span>
-                <input id="customSetNameInput" type="text" placeholder="custom">
-                <input id="customSetDataInput" type="text" placeholder="2 4 6 8">
-                <input id="customSetAddButton" type="button" value="Add">
-            </div>
+            <details>
+                <summary>Make a custom set</summary>
+                <div class="grid" style="grid-template-columns: 2fr 4fr 1fr">
+                    <label for="customSetNameInput">Name</label>
+                    <label for="customSetDataInput">Numbers</label>
+                    <span></span>
+                    <input id="customSetNameInput" type="text" placeholder="custom">
+                    <input id="customSetDataInput" type="text" placeholder="2 4 6 8">
+                    <input id="customSetAddButton" type="button" value="Add">
+                </div>
+            </details>
 
             <h3>Selected options</h3>
             <span id="selectedOptionsDisplay">...</span>

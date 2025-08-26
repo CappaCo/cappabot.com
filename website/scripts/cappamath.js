@@ -5,13 +5,14 @@ const numQuestionsInput = document.getElementById("numQuestions");
 const timePerQuestionInput = document.getElementById("timePerQuestion");
 const estimatedTimeDisplay = document.getElementById("estimatedTime");
 
-const operationRadios = document.querySelectorAll("input[name='operation']");
-const customQuestionRadioButton = document.getElementById("op-custom");
+const operationSelectButtons = document.getElementById("operationSelectButtons");
+let operationRadios = document.querySelectorAll("input[name='operation']");
 
-const customOperationInput = document.getElementById("customOperation");
-const customOperationQuestion = document.getElementById("customOperationQuestion");
-const customOperationAnswer = document.getElementById("customOperationAnswer");
+const customOperationNameInput = document.getElementById("customOperationNameInput");
+const customOperationQuestionInput = document.getElementById("customOperationQuestionInput");
+const customOperationAnswerInput = document.getElementById("customOperationAnswerInput");
 const customOperationPreview = document.getElementById("customOperationPreview");
+const customOperationAddButton = document.getElementById("customOperationAddButton");
 
 const setSelectTable = document.getElementById("setSelectTable");
 
@@ -36,9 +37,31 @@ const requiredVariables = new Set();
 const defaultOptions = {
     numQuestions: 10,
     timePerQuestion: 5,
-    operation: "op-add",
+    operation: "addition",
     question: "$$n_1 + n_2$$",
     answer: "${num1+num2}",
+    operations: {
+        "addition": {
+            question: "$$n_1 + n_2$$",
+            answer: "${num1+num2}",
+        },
+        "subtraction": {
+            question: "$$n_1 - n_2$$",
+            answer: "${num1-num2}",
+        },
+        "multiplication": {
+            question: "$$n_1 \\times n_2$$",
+            answer: "${num1*num2}",
+        },
+        "division": {
+            question: "$$n_1 \\div n_2$$",
+            answer: "${num1/num2}",
+        },
+        "algebra-1": {
+            question: "$${n_1}x^{n_3} \\times {n_2}x^{n_4}$$",
+            answer: "${num1*num2}x^{num3+num4}",
+        },
+    },
     selectedSets: {
         "num1": "1",
         "num2": "1",
@@ -58,6 +81,7 @@ let options = makeOptionsProxy(optionsRaw);
 function makeOptionsProxy(raw) {
     raw.sets = makeProxy(raw.sets, optionsUpdated);
     raw.selectedSets = makeProxy(raw.selectedSets, optionsUpdated);
+    raw.operations = makeProxy(raw.operations, optionsUpdated);
     const proxy = makeProxy(raw, optionsUpdated);
     return proxy;
 }
@@ -73,18 +97,7 @@ function init() {
     numQuestionsInput.dispatchEvent(new Event("input"));
     timePerQuestionInput.value = options.timePerQuestion;
     timePerQuestionInput.dispatchEvent(new Event("input"));
-    for (const el of operationRadios) {
-        if (el.id == options.operation) {
-            el.checked = true;
-            if (el == customQuestionRadioButton) {
-                customOperationQuestion.value = options.question;
-                customOperationAnswer.value = options.answer;
-                customOperationQuestion.dispatchEvent(new Event("input"));
-                customOperationAnswer.dispatchEvent(new Event("input"));
-            }
-            break;
-        }
-    }
+    showOperations();
     updateSelectedOperation();
     showSets();
 }
@@ -109,36 +122,69 @@ function updateEstimatedTime() {
     estimatedTimeDisplay.textContent = (isNaN(estimatedTime)) ? "..." : estimatedTime;
 }
 
-// Make the custom operation input visible when the custom radio button is selected
-operationRadios.forEach(radio => {
-    radio.addEventListener("change", updateSelectedOperation);
-});
+function showOperations() {
+    operationSelectButtons.innerHTML = "";
+    operationRadios = [];
 
-customOperationQuestion.addEventListener("input", (e) => {
-    customOperationPreview.textContent = customOperationQuestion.value;
+    for (const [key, data] of Object.entries(options.operations)) {
+        const id = `op-${key}`
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "operation";
+        input.dataset.question = data.question;
+        input.value = data.answer;
+        input.id = id;
+
+        const label = document.createElement("label");
+        label.for = id;
+        label.innerText = data.question;
+
+        operationSelectButtons.appendChild(input);
+        operationSelectButtons.appendChild(label);
+
+        operationRadios.push(input);
+        MathJax.typeset([label]);
+    }
+
+    operationRadios.forEach(radio => {
+        radio.addEventListener("change", updateSelectedOperation);
+    });
+
+    for (const el of operationRadios) {
+        if (el.id == `op-${options.operation}`) {
+            el.checked = true;
+            break;
+        }
+    }
+}
+
+customOperationQuestionInput.addEventListener("input", () => {
+    customOperationPreview.textContent = customOperationQuestionInput.value.replace("$$", "$i$");
     MathJax.typeset([customOperationPreview]);
 
-    customQuestionRadioButton.dataset.question = customOperationQuestion.value || "";
-
     updateSelectedOperation();
 });
 
-customOperationAnswer.addEventListener("input", (e) => {
-    customQuestionRadioButton.value = customOperationAnswer.value || "";
+customOperationAddButton.addEventListener("click", () => {
+    const customOperationName = customOperationNameInput.value;
 
-    updateSelectedOperation();
+    options.operations[customOperationName] = {
+        question: customOperationQuestionInput.value,
+        answer: customOperationAnswerInput.value,
+    }
+
+    showOperations();
 });
 
 function updateSelectedOperation() {
     const checkedRadio = [...operationRadios].filter(el => el.checked)[0];
 
-    if (checkedRadio.id === "op-custom") {
-        customOperationInput.style.display = "block";
-    } else {
-        customOperationInput.style.display = "none";
+    if (!checkedRadio) {
+        console.error("Checked radio not found");
+        return;
     }
 
-    options.operation = checkedRadio.id;
+    options.operation = checkedRadio.id.replace("op-", "");
     options.question = checkedRadio.dataset.question;
     options.answer = checkedRadio.value;
 
