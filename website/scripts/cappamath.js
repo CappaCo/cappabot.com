@@ -24,6 +24,14 @@ const customSetAddButton = document.getElementById("customSetAddButton");
 const selectedOptionsDisplay = document.getElementById("selectedOptionsDisplay");
 const selectedSetTable = document.getElementById("selectedSetTable");
 
+const safeDivisionButton = document.getElementById("safeDivisionButton");
+
+const mixedOptionsButton = document.getElementById("mixedOptionsButton");
+const mixedOptionsDisplay = document.getElementById("mixedOptionsDisplay");
+const mixedOptionsTable = document.getElementById("mixedOptionsTable");
+const mixedOptionsAddButton = document.getElementById("mixedOptionsAddButton");
+const mixedOptionsResetButton = document.getElementById("mixedOptionsResetButton");
+
 const shareLinkDisplay = document.getElementById("shareLinkDisplay");
 document.getElementById("generateButton").addEventListener("click", generate);
 document.getElementById("shareButton").addEventListener("click", share);
@@ -73,15 +81,23 @@ const defaultOptions = {
         "2": numberRange(13), // 1 through 13
         "3": numberRange(5), // 1 through 5
     },
+    mixedOptions: false,
+    extra: {
+        safeDivision: false,
+    },
 }
 const storageOptions = JSON.parse(localStorage.getItem("options"));
-const optionsRaw = compareObjectKeys(storageOptions, defaultOptions) ? storageOptions : {...defaultOptions};
+const optionsRaw = compareObjectKeys(storageOptions, defaultOptions) ? storageOptions : structuredClone(defaultOptions);
 let options = makeOptionsProxy(optionsRaw);
+
+const storageMixedOptions = JSON.parse(localStorage.getItem("mixedOptions"));
+const mixedOptions = storageMixedOptions || [];
 
 function makeOptionsProxy(raw) {
     raw.sets = makeProxy(raw.sets, optionsUpdated);
     raw.selectedSets = makeProxy(raw.selectedSets, optionsUpdated);
     raw.operations = makeProxy(raw.operations, optionsUpdated);
+    raw.extra = makeProxy(raw.extra, optionsUpdated);
     const proxy = makeProxy(raw, optionsUpdated);
     return proxy;
 }
@@ -100,6 +116,9 @@ function init() {
     showOperations();
     updateSelectedOperation();
     showSets();
+    safeDivisionButton.checked = options.extra.safeDivision;
+    mixedOptionsButton.checked = options.mixedOptions;
+    mixedOptionsButton.dispatchEvent(new Event("change"));
 }
 
 // Add event listeners to update the estimated time when inputs change
@@ -300,6 +319,56 @@ customSetAddButton.addEventListener("click", (event) => {
     showSets();
 });
 
+safeDivisionButton.addEventListener("change", (event) => {
+    options.extra.safeDivision = event.target.checked;
+});
+
+mixedOptionsButton.addEventListener("change", (event) => {
+    options.mixedOptions = event.target.checked;
+    mixedOptionsDisplay.style.display = options.mixedOptions ? "block" : "none";
+    if (options.mixedOptions) {
+        updateMixedOptions();
+        mixedOptionsDisplay.parentElement.open = true;
+    }
+});
+
+function updateMixedOptions() {
+    console.log("updating display");
+    mixedOptionsTable.innerHTML = "";
+    mixedOptions.forEach((option, i) => {
+        console.log("making options");
+        const tr = document.createElement("tr");
+        const numberCell = document.createElement("td");
+        numberCell.innerText = i+1;
+        const questionCell = document.createElement("td");
+        questionCell.innerText = option.question;
+        const setsCell = document.createElement("td");
+        setsCell.innerText = Object.entries(option.selectedSets).map(([name, target]) => `$i$${name.replace("num", "n_")}$$: ${target}`).join(", ");
+        const deteteCell = document.createElement("td");
+        deteteCell.innerHTML = `<button onclick="mixedOptions.splice(${i}, 1); updateMixedOptions();">x</button>`;
+
+        tr.appendChild(numberCell);
+        tr.appendChild(questionCell);
+        tr.appendChild(setsCell);
+        tr.appendChild(deteteCell);
+        mixedOptionsTable.appendChild(tr);
+    });
+
+    MathJax.typeset([mixedOptionsTable]);
+
+    localStorage.setItem("mixedOptions", JSON.stringify(mixedOptions));
+}
+
+mixedOptionsAddButton.addEventListener("click", (event) => {
+    mixedOptions.push(deepCopy(options));
+    updateMixedOptions();
+});
+
+mixedOptionsResetButton.addEventListener("click", () => {
+    mixedOptions.length = 0;
+    updateMixedOptions();
+});
+
 // Display current selected options
 function displaySelectedOptions() {
     selectedOptionsDisplay.innerHTML = `
@@ -338,14 +407,18 @@ function displaySelectedOptions() {
 // Generate the actual page that does the thing
 function generate() {
     console.log("Generating with options:", options);
+    console.log("Generating with mixed options:", mixedOptions);
     window.open("/cappamath-run");
 }
 
 // Share the options as a link
 function share() {
     console.log("Sharing with options:", options);
-    const params = encodeURIComponent(JSON.stringify(options));
-    const link = window.location + `-run?options=${params}`;
+    const optionsParams = encodeURIComponent(JSON.stringify(options));
+    let link = window.location + `-run?options=${optionsParams}`;
+    const mixedOptionsParams = encodeURIComponent(JSON.stringify(mixedOptions));
+    if (options.mixedOptions) link = link + `&mixedOptions=${mixedOptionsParams}`;
+
     shareLinkDisplay.href = link;
     shareLinkDisplay.innerText = link;
     navigator.clipboard.writeText(link)
@@ -399,6 +472,11 @@ function compareObjectKeys(obj1, obj2) {
     if (keys1.length !== keys2.length) return false;
     
     return keys1.every(key => obj2.hasOwnProperty(key));
+}
+
+function deepCopy(obj) {
+    // it works sometimes most of the time
+    return JSON.parse(JSON.stringify(obj));
 }
 
 // Init

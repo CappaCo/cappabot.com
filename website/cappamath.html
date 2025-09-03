@@ -115,6 +115,38 @@
                 </tbody>
             </table>
 
+            <details>
+                <summary>Advanced options</summary>
+
+                <input type="checkbox" id="safeDivisionButton">
+                <label for="safeDivisionButton">Safe division <small>(This will try to pick numbers that produce whole number answers)</small></label>
+                <br>
+                
+                <input type="checkbox" id="mixedOptionsButton">
+                <label for="mixedOptionsButton">Enable mixed options <small>(Multiple different types of operations can appear)</small></label>
+                <div id="mixedOptionsDisplay">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Question</th>
+                                <th>Sets</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="mixedOptionsTable">
+                            <tr>
+                                <td>
+                                    <i>Loading...</i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button id="mixedOptionsAddButton">Add current options to the mixed list</button>
+                    <button id="mixedOptionsResetButton" class="secondary">Reset</button>
+                </div>
+            </details>
+
             <button id="generateButton">Generate!</button>
             <button id="shareButton" class="secondary">Share</button><a id="shareLinkDisplay"></a>
             <br>
