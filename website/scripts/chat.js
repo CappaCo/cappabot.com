@@ -21,6 +21,7 @@ const messages = new Set();
 
 let username = localStorage.getItem("username") || "anon";
 let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
+notificationsEnabledSwitch.checked = notificationsEnabled;
 
 async function initializeChat() {
     // Get messages from server
