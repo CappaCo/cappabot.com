@@ -6,6 +6,8 @@ const messagesField = document.getElementById("messagesField");
 const sendButton = document.getElementById("sendButton");
 const changeUsernameButton = document.getElementById("changeUsernameButton");
 
+const notificationsEnabledSwitch = document.getElementById("notificationsEnabledSwitch");
+
 // Set up WebSocket URL
 const url = "/api/chat";
 const wsUrl = url.replace("https://", "wss://").replace("http://", "ws://");
@@ -18,6 +20,7 @@ let enableSanitization = true; // Enable DOMPurify by default
 const messages = new Set();
 
 let username = localStorage.getItem("username") || "anon";
+let notificationsEnabled = localStorage.getItem("notificationsEnabled") === "true";
 
 async function initializeChat() {
     // Get messages from server
@@ -48,6 +51,7 @@ function connectWebSocket() {
         const message = JSON.parse(event.data);
         messages.add(message);
         renderMessages();
+        sendMessageNotification(message);
     };
 
     socket.onclose = () => {
@@ -99,6 +103,15 @@ function renderMessages() {
     console.log("Removed:", DOMPurify.removed);
 }
 
+function sendMessageNotification(message) {
+    if (!notificationsEnabled) return;
+    if (username == message.user) return;
+    console.log("sending notification for message:", message);
+    const notification = new Notification("New message in CappaChat", {
+        body: `Sent by ${message.user}`,
+    });
+}
+
 function changeUsername() {
     const newUsername = prompt("Enter your new username:", username);
     if (newUsername && newUsername.trim() !== "") {
@@ -116,6 +129,17 @@ inputField.addEventListener("keypress", function (event) {
 
 sendButton.addEventListener("click", sendMessage);
 changeUsernameButton.addEventListener("click", changeUsername);
+notificationsEnabledSwitch.addEventListener("change", (event) => {
+    console.log("notification input changed");
+    notificationsEnabled = event.target.checked;
+    if (notificationsEnabled) {
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+    }
+
+    localStorage.setItem("notificationsEnabled", notificationsEnabled);
+});
 
 // Initialize chat
 initializeChat().then(
