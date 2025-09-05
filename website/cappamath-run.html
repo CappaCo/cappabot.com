@@ -56,8 +56,25 @@
             </div>
 
             <div id="questionScreen" class="screen">
-                <progress id="questionLoadingBar"></progress>
+                <progress id="questionLoadingBar" style="transition: none; animation: none;"></progress>
                 <span id="questionDisplay">$$2+2$$</span>
+            </div>
+
+            <div id="answersScreen" class="screen">
+                <table>
+                    <thead>
+                        <th>#</th>
+                        <th>question</th>
+                        <th>answer</th>
+                    </thead>
+                    <tbody id="answersTable">
+                        <tr>
+                            <td>1</td>
+                            <td>$i$2+2$$</td>
+                            <td>$i$4$$</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </main>
         <script>

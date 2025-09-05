@@ -109,14 +109,19 @@ function shuffle(array) {
 function startQuestions() {
     console.log("I'm spongebob!");
 
-    let questionPromise = new Promise((res) => {res()});
-    calculated.reduce((promiseChain, calculation) => {
+    const questionPromise = Promise.resolve();
+    const questionsDone = calculated.reduce((promiseChain, calculation) => {
         return promiseChain.then(() => {
             console.log("showing question");
             console.log(calculation);
             return showQuestion(calculation.question, calculation.time);
         });
-    }, Promise.resolve());
+    }, questionPromise);
+    questionsDone.then(() => {
+        console.log("questions done!");
+        changeScreen("answers");
+        showAnswers();
+    });
 }
 
 async function showQuestion(question, time) {
@@ -137,12 +142,31 @@ async function doQuestionLoadingBar(time) {
         questionLoadingBar.value = 0;
 
         const loadingInterval = setInterval(() => {
-            value += loadingUpdateTime;
             questionLoadingBar.value = value;
-            if (value >= time) {
+            if (value > time) {
                 clearInterval(loadingInterval);
                 resolve();
             }
+            value += loadingUpdateTime;
         }, loadingUpdateTime*1000);
     });
+}
+
+function showAnswers() {
+    const answersTable = document.getElementById("answersTable");
+    answersTable.innerHTML = "";
+    for (const [i, calculation] of calculated.entries()) {
+        const tr = document.createElement("tr");
+        const no = document.createElement("td");
+        no.innerText = i+1;
+        const questionCell = document.createElement("td");
+        questionCell.innerHTML = calculation.question.replace("$$", "$i$");
+        const answerCell = document.createElement("td");
+        answerCell.innerText = `$i$${calculation.answer}$$`;
+        tr.appendChild(no);
+        tr.appendChild(questionCell);
+        tr.appendChild(answerCell);
+        answersTable.appendChild(tr);
+    }
+    MathJax.typeset([answersTable]);
 }
