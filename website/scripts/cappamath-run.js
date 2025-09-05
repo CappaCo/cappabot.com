@@ -37,12 +37,15 @@ function getOptionsJSON(optionsName) {
 console.log("running with options:");
 console.log(singleOptions);
 
-document.getElementById("startButton").addEventListener("click", () => {
-    changeScreen("question");
+calculateQuestions();
+showAnswers();
 
-    calculateQuestions();
+document.getElementById("startButton").addEventListener("click", startButton);
+
+function startButton() {
+    changeScreen("questions");
     startQuestions();
-});
+}
 
 function changeScreen(screenName) {
     screens.filter((el) => el.classList.contains("active")).forEach((el) => el.classList.remove("active"));
@@ -51,13 +54,15 @@ function changeScreen(screenName) {
 
 function calculateQuestions() {
     console.log("calculating questions...");
-    const allOptions = singleOptions.mixedOptions ? mixedOptions : [singleOptions]
+    const allOptions = singleOptions.mixedOptions ? mixedOptions : [singleOptions];
     
     allOptions.forEach((options) => {
         for (let i = 0; i < options.numQuestions; i++) {
             calculated.push(calculateQuestion(options));
         }
     });
+
+    shuffle(calculated);
 
     console.log("calculated:", calculated);
 }
@@ -87,14 +92,50 @@ function calculateQuestion(options) {
     });
 
     let answer = options.answer;
-
+    const func = `return \`${answer}\``;
+    console.log("func:", func);
+    const calculate = new Function(...Object.keys(numbers), func);
+    answer = calculate(...Object.values(numbers)).toString();
     console.log("answer:", answer);
+
+    if (options.extra.integerOnly) {
+        if (!checkInteger(answer)) {
+            console.log("non-integer detected, recalculating...");
+            return calculateQuestion(options);
+        }
+    }
+
+    const number = parseFloat(answer);
+    if (options.extra.positiveAllowed && !options.extra.negativeAllowed) {
+        if (number < 0) {
+            console.log("negative answer detected, recalculating...");
+            return calculateQuestion(options);
+        }
+    } else if (!options.extra.positiveAllowed && options.extra.negativeAllowed) {
+        if (number > 0) {
+            console.log("positive answer detected, recalculating...");
+            return calculateQuestion(options);
+        }
+    } else if (!options.extra.positiveAllowed && !options.extra.negativeAllowed) {
+        if (number != 0) {
+            console.log("non-zero answer detected, recalculating...");
+            return calculateQuestion(options);
+        }
+    }
 
     return {
         question: question,
         answer: answer,
         time: options.timePerQuestion,
     }
+}
+
+function checkInteger(answer) {
+    // Check for division by zero, undefined  results
+    if (answer == "NaN" || answer == "Infinity" || answer == "-Infinity" || answer.includes(".")) {
+        return false;
+    }
+    return true;
 }
 
 function randomItem(arr) {
@@ -128,7 +169,7 @@ function startQuestions() {
     });
 }
 
-async function showQuestion(question, time) {
+function showQuestion(question, time) {
     questionDisplay.innerText = question;
     MathJax.typeset([questionDisplay]);
     return new Promise((resolve) => {
@@ -137,7 +178,7 @@ async function showQuestion(question, time) {
     });
 }
 
-async function doQuestionLoadingBar(time) {
+function doQuestionLoadingBar(time) {
     return new Promise((resolve) => {
         let value = 0;
         const loadingUpdateTime = 0.1;
@@ -145,34 +186,38 @@ async function doQuestionLoadingBar(time) {
         questionLoadingBar.max = time;
         questionLoadingBar.value = 0;
 
-        const loadingInterval = setInterval(() => {
+        let loadingInterval;
+        function updateBar() {
             questionLoadingBar.value = value;
             if (value > time) {
                 clearInterval(loadingInterval);
                 resolve();
             }
             value += loadingUpdateTime;
-        }, loadingUpdateTime*1000);
+        }
+
+        loadingInterval = setInterval(updateBar, loadingUpdateTime*1000);
+        updateBar();
     });
 }
 
-
-
 function showAnswers() {
-    changeScreen("answers");
     const answersTable = document.getElementById("answersTable");
     answersTable.innerHTML = "";
     for (const [i, calculation] of calculated.entries()) {
         const tr = document.createElement("tr");
+
         const no = document.createElement("td");
         no.innerText = i+1;
         const questionCell = document.createElement("td");
         questionCell.innerHTML = calculation.question.replace("$$", "$i$");
         const answerCell = document.createElement("td");
         answerCell.innerText = `$i$${calculation.answer}$$`;
+
         tr.appendChild(no);
         tr.appendChild(questionCell);
         tr.appendChild(answerCell);
+        
         answersTable.appendChild(tr);
     }
     MathJax.typeset([answersTable]);

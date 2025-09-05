@@ -24,7 +24,9 @@ const customSetAddButton = document.getElementById("customSetAddButton");
 const selectedOptionsDisplay = document.getElementById("selectedOptionsDisplay");
 const selectedSetTable = document.getElementById("selectedSetTable");
 
-const safeDivisionButton = document.getElementById("safeDivisionButton");
+const positiveAllowedButton = document.getElementById("positiveAllowedButton");
+const negativeAllowedButton = document.getElementById("negativeAllowedButton");
+const integerOnlyButton = document.getElementById("integerOnlyButton");
 
 const mixedOptionsButton = document.getElementById("mixedOptionsButton");
 const mixedOptionsDisplay = document.getElementById("mixedOptionsDisplay");
@@ -83,7 +85,9 @@ const defaultOptions = {
     },
     mixedOptions: false,
     extra: {
-        safeDivision: false,
+        positiveAllowed: true,
+        negativeAllowed: true,
+        integerOnly: false,
     },
 }
 const storageOptions = JSON.parse(localStorage.getItem("options"));
@@ -116,7 +120,9 @@ function init() {
     showOperations();
     updateSelectedOperation();
     showSets();
-    safeDivisionButton.checked = options.extra.safeDivision;
+    positiveAllowedButton.checked = options.extra.positiveAllowed;
+    negativeAllowedButton.checked = options.extra.negativeAllowed;
+    integerOnlyButton.checked = options.extra.integerOnly;
     mixedOptionsButton.checked = options.mixedOptions;
     mixedOptionsButton.dispatchEvent(new Event("change"));
 }
@@ -319,8 +325,16 @@ customSetAddButton.addEventListener("click", (event) => {
     showSets();
 });
 
-safeDivisionButton.addEventListener("change", (event) => {
-    options.extra.safeDivision = event.target.checked;
+positiveAllowedButton.addEventListener("change", (event) => {
+    options.extra.positiveAllowed = event.target.checked;
+});
+
+negativeAllowedButton.addEventListener("change", (event) => {
+    options.extra.negativeAllowed = event.target.checked;
+});
+
+integerOnlyButton.addEventListener("change", (event) => {
+    options.extra.integerOnly = event.target.checked;
 });
 
 mixedOptionsButton.addEventListener("change", (event) => {
