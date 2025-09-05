@@ -1,6 +1,8 @@
 console.log("cappamath-run.js is running");
 
 const screens = [...document.getElementsByClassName("screen")];
+const questionDisplay = document.getElementById("questionDisplay");
+const questionLoadingBar = document.getElementById("questionLoadingBar");
 
 const queryParams = new URLSearchParams(window.location.search);
 const singleOptions = getOptions("options");
@@ -52,14 +54,95 @@ function calculateQuestions() {
     const allOptions = singleOptions.mixedOptions ? mixedOptions : [singleOptions]
     
     allOptions.forEach((options) => {
-        calculated.push(calculateQuestion(options));
+        for (let i = 0; i < options.numQuestions; i++) {
+            calculated.push(calculateQuestion(options));
+        }
     });
+
+    console.log("calculated:", calculated);
 }
 
 function calculateQuestion(options) {
-    console.log("calculating using:", options.question);
+    console.log("calculating using:", options.question, "=", options.answer);
+    const sets = {};
+
+    for (const [key, value] of Object.entries(options.selectedSets)) {
+        sets[key] = options.sets[value];
+    }
+
+    console.log("sets:", sets);
+
+    const numbers = {};
+    for (const [key, value] of Object.entries(sets)) {
+        numbers[key] = randomItem(value);
+    }
+
+    console.log("numbers:", numbers);
+
+    let question = options.question;
+    question.match(/n_\d+/gm).forEach((match) => {
+        console.log("found match", match);
+        const split = match.split("_");
+        question = question.replace(match, numbers[`num${split[1]}`]);
+    });
+
+    return {
+        question: question,
+        time: options.timePerQuestion,
+    }
+}
+
+function randomItem(arr) {
+    return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function shuffle(array) {
+    let currentIndex = array.length;
+
+    while (currentIndex != 0) {
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
 }
 
 function startQuestions() {
     console.log("I'm spongebob!");
+
+    let questionPromise = new Promise((res) => {res()});
+    calculated.reduce((promiseChain, calculation) => {
+        return promiseChain.then(() => {
+            console.log("showing question");
+            console.log(calculation);
+            return showQuestion(calculation.question, calculation.time);
+        });
+    }, Promise.resolve());
+}
+
+async function showQuestion(question, time) {
+    questionDisplay.innerText = question;
+    MathJax.typeset([questionDisplay]);
+    return new Promise((resolve) => {
+        doQuestionLoadingBar(time)
+            .then(resolve);
+    });
+}
+
+async function doQuestionLoadingBar(time) {
+    return new Promise((resolve) => {
+        let value = 0;
+        const loadingUpdateTime = 0.1;
+
+        questionLoadingBar.max = time;
+        questionLoadingBar.value = 0;
+
+        const loadingInterval = setInterval(() => {
+            value += loadingUpdateTime;
+            questionLoadingBar.value = value;
+            if (value >= time) {
+                clearInterval(loadingInterval);
+                resolve();
+            }
+        }, loadingUpdateTime*1000);
+    });
 }

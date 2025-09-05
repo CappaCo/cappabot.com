@@ -40,7 +40,7 @@
 
             /* start screen */
             /* question screen */
-            #question {
+            #questionDisplay {
                 font-size: 5em;
             }
         </style>
@@ -56,7 +56,8 @@
             </div>
 
             <div id="questionScreen" class="screen">
-                <span id="question">$$2+2$$</span>
+                <progress id="questionLoadingBar"></progress>
+                <span id="questionDisplay">$$2+2$$</span>
             </div>
         </main>
         <script>
