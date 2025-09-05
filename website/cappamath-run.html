@@ -60,6 +60,12 @@
                 <span id="questionDisplay">$$2+2$$</span>
             </div>
 
+            <div id="answersWaitScreen" class="screen">
+                <div>
+                    <button onclick="showAnswers()">Show answers</button>
+                </div>
+            </div>
+
             <div id="answersScreen" class="screen">
                 <table>
                     <thead>
@@ -69,9 +75,7 @@
                     </thead>
                     <tbody id="answersTable">
                         <tr>
-                            <td>1</td>
-                            <td>$i$2+2$$</td>
-                            <td>$i$4$$</td>
+                            <td><progress></progress></td>
                         </tr>
                     </tbody>
                 </table>

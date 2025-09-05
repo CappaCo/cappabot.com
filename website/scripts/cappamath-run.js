@@ -86,8 +86,13 @@ function calculateQuestion(options) {
         question = question.replace(match, numbers[`num${split[1]}`]);
     });
 
+    let answer = options.answer;
+
+    console.log("answer:", answer);
+
     return {
         question: question,
+        answer: answer,
         time: options.timePerQuestion,
     }
 }
@@ -119,8 +124,7 @@ function startQuestions() {
     }, questionPromise);
     questionsDone.then(() => {
         console.log("questions done!");
-        changeScreen("answers");
-        showAnswers();
+        changeScreen("answersWait");
     });
 }
 
@@ -152,7 +156,10 @@ async function doQuestionLoadingBar(time) {
     });
 }
 
+
+
 function showAnswers() {
+    changeScreen("answers");
     const answersTable = document.getElementById("answersTable");
     answersTable.innerHTML = "";
     for (const [i, calculation] of calculated.entries()) {
