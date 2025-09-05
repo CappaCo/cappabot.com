@@ -309,13 +309,22 @@ function showSets() {
     }
 }
 
-customSetAddButton.addEventListener("click", (event) => {
+// Add custom set when user presses enter in the input box
+customSetDataInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        addCustomSet(event);
+    }
+});
+customSetAddButton.addEventListener("click", addCustomSet);
+
+function addCustomSet(event) {
     event.preventDefault();
 
     const customSetName = customSetNameInput.value.trim();
-    const dataValue = customSetDataInput.value.trim();
+    if (!customSetName) return;
+    let dataValue = customSetDataInput.value.trim();
     if (dataValue) {
-        const customSetData = dataValue.split(/[,\s]+/).map(Number);
+        const customSetData = parseCustomSet(dataValue);
         options.sets[customSetName] = customSetData;
     } else {
         delete options.sets[customSetName];
@@ -323,7 +332,35 @@ customSetAddButton.addEventListener("click", (event) => {
 
     showSetSelection();
     showSets();
-});
+}
+
+const safeFunctions = {
+    range: numberRange,
+}
+
+function parseCustomSet(input) {
+    // Case 1: Plain numbers (with spaces or commas)
+    if (/^[\d\s,]+$/.test(input)) {
+        return input
+            .split(/[\s,]+/) // split on spaces or commas
+            .filter(Boolean) // remove empties
+            .map(Number);    // convert to numbers
+    }
+
+    // Case 2: Function calls, but only from safeFunctions
+    const funcMatch = input.match(/^(\w+)\((.*)\)$/);
+    if (funcMatch) {
+        const [, fnName, argsStr] = funcMatch;
+        const fn = safeFunctions[fnName];
+        if (!fn) throw new Error(`Function "${fnName}" is not allowed`);
+
+        // parse arguments (simple split on comma, can be improved)
+        const args = argsStr.split(",").map(a => a.trim()).map(Number);
+        return fn(...args);
+    }
+
+    throw new Error("Invalid input format");
+}
 
 positiveAllowedButton.addEventListener("change", (event) => {
     options.extra.positiveAllowed = event.target.checked;
