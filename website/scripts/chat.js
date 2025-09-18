@@ -111,6 +111,13 @@ function sendMessageNotification(message) {
     const notification = new Notification("New message in CappaChat", {
         body: `Sent by ${message.user}`,
     });
+
+    notification.onclick = notificationClick;
+    
+    function notificationClick() {
+        console.log("notification clicked");
+        window.parent.parent.focus();
+    }
 }
 
 function changeUsername() {
