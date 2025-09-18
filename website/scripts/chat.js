@@ -117,6 +117,7 @@ function sendMessageNotification(message) {
     function notificationClick() {
         console.log("notification clicked");
         window.parent.parent.focus();
+        notification.close();
     }
 }
 
