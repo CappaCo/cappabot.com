@@ -118,7 +118,7 @@ export async function run(req: Request): Promise<Response> {
     } else if (reqMethod == "GET") {
         // Check header for if the request wants json or text
         const acceptHeader = req.headers.get("accept") || "";
-        let responseJSON;
+        let responseJSON: ChatMessage[] | string[];
         console.log("Accept header:", acceptHeader);
         if (acceptHeader.includes("application/json")) {
             responseJSON = Array.from(messages).sort((a, b) => a.timestamp - b.timestamp);
@@ -127,6 +127,7 @@ export async function run(req: Request): Promise<Response> {
                 .map(msg => `${msg.user}: ${msg.message}`)
                 .reverse(); // Reverse to show latest messages first
         }
+
         return new Response(JSON.stringify(responseJSON), {
             headers: {
                 "Content-Type": "application/json",

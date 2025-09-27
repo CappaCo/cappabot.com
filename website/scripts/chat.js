@@ -95,7 +95,7 @@ function renderMessages() {
             const timestamp = `<span class="timestamp">(${new Date(msg.timestamp).toLocaleTimeString()})</span>`;
             const user = `<strong>${msg.user}</strong>`;
             const message = msg.message;
-            return `${timestamp} ${user}: ${message}`;
+            return `<span class="message" id="message-${msg.timestamp}">${timestamp} ${user}: ${message}</span>`;
         })
         .join("<br>");
     
@@ -111,6 +111,45 @@ function sendMessageNotification(message) {
     const notification = new Notification("New message in CappaChat", {
         body: `Sent by ${message.user}`,
     });
+
+    notification.onclick = notificationClick;
+    
+    function notificationClick() {
+        console.log("notification clicked");
+        window.parent.parent.focus();
+
+        // Find the message that caused the notification
+        const theMessage = findMessage(message.timestamp);
+        if (!theMessage) {
+            console.error("Couldn't find message!");
+        } else {
+            console.log("found message:", theMessage);
+            highlightMessage(theMessage);
+        }
+
+        notification.close();
+    }
+}
+
+function highlightMessage(message) {
+    var messageHighlightTimeout;
+    clearTimeout(messageHighlightTimeout);
+
+    console.log("highlighting message");
+    message.classList.add("highlight");
+    messageHighlightTimeout = setTimeout(() => {
+        console.log("un-highlighting message");
+        message.classList.remove("highlight");
+    }, 2000);
+}
+
+function findMessage(messageID) {
+    console.log("finding message with id: " + messageID);
+    return [...document.getElementById("messagesField").children]
+        .filter((el) => {
+            return el.id.replace("message-", "") == messageID;
+        })
+        [0];
 }
 
 function changeUsername() {
