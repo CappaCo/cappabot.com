@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- Title the webiste tab -->
+        <title>PID Pong - CappaBot</title>
+        <!-- Use the pico stylesheet because it looks cool -->
+        <link rel="stylesheet" href="/styles/pico.min.css" type="text/css">
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="PID Pong is a pong game that uses a PID controller to control the paddles.">
+    </head>
+    <body>
+        <!-- Main pico container -->
+        <main class="container">
+            <hgroup>
+                <h1><a href="/">CappaBot</a></h1>
+                <p>Welcome to the CappaBot website!</p>
+            </hgroup>
+
+            <h2>PID Pong</h2>
+
+            <canvas id="gameCanvas" width="800" height="600" style="border:1px solid #000000;"></canvas>
+
+            <!-- Add this inside <main class="container">, above or below the canvas -->
+            <section>
+                <h3>PID Controls</h3>
+                <div style="display: flex; gap: 2rem;">
+                    <div style="flex: 1;">
+                        <h4>Left Paddle</h4>
+                        <label for="leftKp">Kp: <span id="leftKpVal">---</span></label>
+                        <input type="range" id="leftKp" min="0" max="100" step="0.5" value="20">
+                        <label for="leftKi">Ki: <span id="leftKiVal">---</span></label>
+                        <input type="range" id="leftKi" min="0" max="2" step="0.01" value="0">
+                        <label for="leftKd">Kd: <span id="leftKdVal">---</span></label>
+                        <input type="range" id="leftKd" min="0" max="10" step="0.1" value="5">
+                    </div>
+                    <div style="flex: 1;">
+                        <h4>Right Paddle</h4>
+                        <label for="rightKp">Kp: <span id="rightKpVal">---</span></label>
+                        <input type="range" id="rightKp" min="0" max="100" step="0.5" value="20">
+                        <label for="rightKi">Ki: <span id="rightKiVal">---</span></label>
+                        <input type="range" id="rightKi" min="0" max="2" step="0.01" value="0">
+                        <label for="rightKd">Kd: <span id="rightKdVal">---</span></label>
+                        <input type="range" id="rightKd" min="0" max="10" step="0.1" value="5">
+                    </div>
+                </div>
+            </section>
+
+            <div style="margin-top:1em;">
+                <label for="gravitySlider">Gravity: <span id="gravityVal">0</span></label>
+                <input type="range" id="gravitySlider" min="-1000" max="1000" step="1" value="0">
+            </div>
+
+            <script src="/scripts/pid-pong.js" type="text/javascript"></script>
+
+            <footer>
+                Made by CappaBot<br>
+                <a href="/terms-of-service">Terms of service</a> | <a href="/privacy-policy">Privacy policy</a>
+            </footer>
+        </main>
+        <script src="/scripts/main.js" type="text/javascript"></script>
+    </body>
+</html>
