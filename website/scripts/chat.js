@@ -49,7 +49,14 @@ function connectWebSocket() {
     };
 
     socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
+        const json = JSON.parse(event.data);
+
+        const message = {
+            user: json.user,
+            timestamp: json.timestamp,
+            message: json.message,
+        }
+        
         messages.add(message);
         renderMessages();
         sendMessageNotification(message);
