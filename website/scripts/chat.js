@@ -172,10 +172,9 @@ changeUsernameButton.addEventListener("click", changeUsername);
 notificationsEnabledSwitch.addEventListener("change", (event) => {
     console.log("notification input changed");
     notificationsEnabled = event.target.checked;
-    if (notificationsEnabled) {
-        if (Notification.permission !== "granted") {
-            Notification.requestPermission();
-        }
+    
+    if (Notification.permission !== "granted" && notificationsEnabled) {
+        Notification.requestPermission();
     }
 
     localStorage.setItem("notificationsEnabled", notificationsEnabled);
