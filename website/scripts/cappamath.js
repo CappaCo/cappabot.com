@@ -102,6 +102,7 @@ const defaultPreferences = {
 const storagePreferences = JSON.parse(localStorage.getItem("CappaMath-preferences"));
 const preferencesRaw = storagePreferences || defaultPreferences;
 const preferences = makeProxy(preferencesRaw, preferencesUpdated);
+preferencesUpdated();
 
 function preferencesUpdated() {
     localStorage.setItem("CappaMath-preferences", JSON.stringify(preferences));
