@@ -27,6 +27,7 @@ const selectedSetTable = document.getElementById("selectedSetTable");
 const positiveAllowedButton = document.getElementById("positiveAllowedButton");
 const negativeAllowedButton = document.getElementById("negativeAllowedButton");
 const integerOnlyButton = document.getElementById("integerOnlyButton");
+const answersWaitScreenButton = document.getElementById("answersWaitScreenButton");
 
 const mixedOptionsButton = document.getElementById("mixedOptionsButton");
 const mixedOptionsDisplay = document.getElementById("mixedOptionsDisplay");
@@ -84,45 +85,58 @@ const defaultOptions = {
         "3": numberRange(5), // 1 through 5
     },
     mixedOptions: false,
-    extra: {
-        positiveAllowed: true,
-        negativeAllowed: true,
-        integerOnly: false,
-    },
+    positiveAllowed: true,
+    negativeAllowed: true,
+    integerOnly: false,
 }
-const storageOptions = JSON.parse(localStorage.getItem("options"));
+const storageOptions = JSON.parse(localStorage.getItem("CappaMath-options"));
 const optionsRaw = compareObjectKeys(storageOptions, defaultOptions) ? storageOptions : structuredClone(defaultOptions);
 let options = makeOptionsProxy(optionsRaw);
 
-const storageMixedOptions = JSON.parse(localStorage.getItem("mixedOptions"));
+const storageMixedOptions = JSON.parse(localStorage.getItem("CappaMath-mixedOptions"));
 const mixedOptions = storageMixedOptions || [];
+
+const defaultPreferences = {
+    answersWaitScreen: false,
+}
+const storagePreferences = JSON.parse(localStorage.getItem("CappaMath-preferences"));
+const preferencesRaw = storagePreferences || defaultPreferences;
+const preferences = makeProxy(preferencesRaw, preferencesUpdated);
+
+function preferencesUpdated() {
+    localStorage.setItem("CappaMath-preferences", JSON.stringify(preferences));
+}
 
 function makeOptionsProxy(raw) {
     raw.sets = makeProxy(raw.sets, optionsUpdated);
     raw.selectedSets = makeProxy(raw.selectedSets, optionsUpdated);
     raw.operations = makeProxy(raw.operations, optionsUpdated);
-    raw.extra = makeProxy(raw.extra, optionsUpdated);
     const proxy = makeProxy(raw, optionsUpdated);
     return proxy;
 }
 
 function optionsUpdated() {
-    localStorage.setItem("options", JSON.stringify(options));
+    localStorage.setItem("CappaMath-options", JSON.stringify(options));
     displaySelectedOptions();
 }
 
 function init() {
     console.log("running init");
+
     numQuestionsInput.value = options.numQuestions;
     numQuestionsInput.dispatchEvent(new Event("input"));
     timePerQuestionInput.value = options.timePerQuestion;
     timePerQuestionInput.dispatchEvent(new Event("input"));
+
     showOperations();
     updateSelectedOperation();
     showSets();
-    positiveAllowedButton.checked = options.extra.positiveAllowed;
-    negativeAllowedButton.checked = options.extra.negativeAllowed;
-    integerOnlyButton.checked = options.extra.integerOnly;
+
+    positiveAllowedButton.checked = options.positiveAllowed;
+    negativeAllowedButton.checked = options.negativeAllowed;
+    integerOnlyButton.checked = options.integerOnly;
+    answersWaitScreenButton.checked = options.answersWaitScreen;
+
     mixedOptionsButton.checked = options.mixedOptions;
     mixedOptionsButton.dispatchEvent(new Event("change"));
 }
@@ -334,44 +348,36 @@ function addCustomSet(event) {
     showSets();
 }
 
-const safeFunctions = {
-    range: numberRange,
-}
-
 function parseCustomSet(input) {
-    // Case 1: Plain numbers (with spaces or commas)
-    if (/^[\d\s,]+$/.test(input)) {
-        return input
-            .split(/[\s,]+/) // split on spaces or commas
-            .filter(Boolean) // remove empties
-            .map(Number);    // convert to numbers
-    }
+    const split = input
+        .trim()
+        .split(/[\s,]+/);
 
-    // Case 2: Function calls, but only from safeFunctions
-    const funcMatch = input.match(/^(\w+)\((.*)\)$/);
-    if (funcMatch) {
-        const [, fnName, argsStr] = funcMatch;
-        const fn = safeFunctions[fnName];
-        if (!fn) throw new Error(`Function "${fnName}" is not allowed`);
-
-        // parse arguments (simple split on comma, can be improved)
-        const args = argsStr.split(",").map(a => a.trim()).map(Number);
-        return fn(...args);
+    const valid = split.every((p) => {
+            return p !== "" && !isNaN(Number(p))
+        });
+    
+    if (valid) {
+        return split;
     }
 
     throw new Error("Invalid input format");
 }
 
 positiveAllowedButton.addEventListener("change", (event) => {
-    options.extra.positiveAllowed = event.target.checked;
+    options.positiveAllowed = event.target.checked;
 });
 
 negativeAllowedButton.addEventListener("change", (event) => {
-    options.extra.negativeAllowed = event.target.checked;
+    options.negativeAllowed = event.target.checked;
 });
 
 integerOnlyButton.addEventListener("change", (event) => {
-    options.extra.integerOnly = event.target.checked;
+    options.integerOnly = event.target.checked;
+});
+
+answersWaitScreenButton.addEventListener("change", (event) => {
+    preferences.answersWaitScreen = event.target.checked;
 });
 
 mixedOptionsButton.addEventListener("change", (event) => {
@@ -407,7 +413,7 @@ function updateMixedOptions() {
 
     MathJax.typeset([mixedOptionsTable]);
 
-    localStorage.setItem("mixedOptions", JSON.stringify(mixedOptions));
+    localStorage.setItem("CappaMath-mixedOptions", JSON.stringify(mixedOptions));
 }
 
 mixedOptionsAddButton.addEventListener("click", (event) => {

@@ -4,12 +4,17 @@ const screens = [...document.getElementsByClassName("screen")];
 const questionDisplay = document.getElementById("questionDisplay");
 const questionLoadingBar = document.getElementById("questionLoadingBar");
 
+let skipToEndRequested = false;
+let pendingResolvers = [];
+
 const queryParams = new URLSearchParams(window.location.search);
-const singleOptions = getOptions("options");
+const singleOptions = getOptions("CappaMath-options");
 if (singleOptions.mixedOptions) {
     console.log("using mixed options :O");
-    mixedOptions = getOptions("mixedOptions");
+    mixedOptions = getOptions("CappaMath-mixedOptions");
 }
+
+const preferences = JSON.parse(localStorage.getItem("CappaMath-preferences"));
 
 const calculated = [];
 
@@ -18,7 +23,7 @@ function getOptions(optionsName) {
 }
 
 function getOptionsJSON(optionsName) {
-    const search = optionsName || "options";
+    const search = optionsName || "CappaMath-options";
     const optionsParams = queryParams.get(search);
     if (optionsParams) {
         console.log("Getting options from url");
@@ -37,10 +42,9 @@ function getOptionsJSON(optionsName) {
 console.log("running with options:");
 console.log(singleOptions);
 
+changeScreen("start");
 calculateQuestions();
 showAnswers();
-
-document.getElementById("startButton").addEventListener("click", startButton);
 
 function startButton() {
     changeScreen("questions");
@@ -79,7 +83,7 @@ function calculateQuestion(options) {
 
     const numbers = {};
     for (const [key, value] of Object.entries(sets)) {
-        numbers[key] = randomItem(value);
+        numbers[key] = Number(randomItem(value));
     }
 
     console.log("numbers:", numbers);
@@ -98,7 +102,7 @@ function calculateQuestion(options) {
     answer = calculate(...Object.values(numbers)).toString();
     console.log("answer:", answer);
 
-    if (options.extra.integerOnly) {
+    if (options.integerOnly) {
         if (!checkInteger(answer)) {
             console.log("non-integer detected, recalculating...");
             return calculateQuestion(options);
@@ -106,17 +110,17 @@ function calculateQuestion(options) {
     }
 
     const number = parseFloat(answer);
-    if (options.extra.positiveAllowed && !options.extra.negativeAllowed) {
+    if (options.positiveAllowed && !options.negativeAllowed) {
         if (number < 0) {
             console.log("negative answer detected, recalculating...");
             return calculateQuestion(options);
         }
-    } else if (!options.extra.positiveAllowed && options.extra.negativeAllowed) {
+    } else if (!options.positiveAllowed && options.negativeAllowed) {
         if (number > 0) {
             console.log("positive answer detected, recalculating...");
             return calculateQuestion(options);
         }
-    } else if (!options.extra.positiveAllowed && !options.extra.negativeAllowed) {
+    } else if (!options.positiveAllowed && !options.negativeAllowed) {
         if (number != 0) {
             console.log("non-zero answer detected, recalculating...");
             return calculateQuestion(options);
@@ -158,28 +162,44 @@ function startQuestions() {
     const questionPromise = Promise.resolve();
     const questionsDone = calculated.reduce((promiseChain, calculation) => {
         return promiseChain.then(() => {
-            console.log("showing question");
-            console.log(calculation);
             return showQuestion(calculation.question, calculation.time);
         });
     }, questionPromise);
+
     questionsDone.then(() => {
         console.log("questions done!");
-        changeScreen("answersWait");
+        if (preferences.answersWaitScreen) {
+            changeScreen("answersWait");
+        } else {
+            changeScreen("answers");
+        }
     });
 }
 
 function showQuestion(question, time) {
-    questionDisplay.innerText = question;
-    MathJax.typeset([questionDisplay]);
     return new Promise((resolve) => {
-        doQuestionLoadingBar(time)
-            .then(resolve);
+        if (skipToEndRequested) return resolve();
+
+        pendingResolvers.push(resolve);
+
+        console.log("showing question");
+
+        questionDisplay.innerText = question;
+        MathJax.typeset([questionDisplay]);
+
+        doQuestionLoadingBar(time).then(resolve);
     });
 }
 
 function doQuestionLoadingBar(time) {
     return new Promise((resolve) => {
+        if (skipToEndRequested) return resolve();
+        
+        pendingResolvers.push(() => {
+            clearInterval(loadingInterval);
+            resolve();
+        });
+
         let value = 0;
         const loadingUpdateTime = 0.1;
 
@@ -188,6 +208,12 @@ function doQuestionLoadingBar(time) {
 
         let loadingInterval;
         function updateBar() {
+            if (skipToEndRequested) {
+                clearInterval(loadingInterval);
+                resolve();
+                return;
+            }
+
             questionLoadingBar.value = value;
             if (value > time) {
                 clearInterval(loadingInterval);
@@ -221,4 +247,17 @@ function showAnswers() {
         answersTable.appendChild(tr);
     }
     MathJax.typeset([answersTable]);
+}
+
+function skipToEnd() {
+    console.log("skipping to end");
+
+    console.log(pendingResolvers);
+
+    skipToEndRequested = true;
+
+    for (const resolve of pendingResolvers) {
+        console.log("resolving...");
+        resolve();
+    }
 }

@@ -67,10 +67,10 @@
     <body>
         <!-- Main pico container -->
         <main class="container">
-            <div id="startScreen" class="screen active">
+            <div id="startScreen" class="screen">
                 <div>
                     <h1>Welcome to CappaMath</h1>
-                    <button id="startButton">Start</button>
+                    <button onclick="startButton()">Start</button>
                 </div>
             </div>
 
@@ -79,6 +79,7 @@
                 <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                     <span id="questionDisplay">$$2+2$$</span>
                 </div>
+                <button onclick="skipToEnd()" style="position: absolute; bottom: 0.5rem; right: 0.5rem; font-size: 0.7rem; padding: 0.5rem;">Skip to end</button>
             </div>
 
             <div id="answersWaitScreen" class="screen">

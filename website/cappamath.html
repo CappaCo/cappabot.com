@@ -50,7 +50,7 @@
                 <small>Ask Casper how to use this feature</small>
             </details>
 
-            <h3>Choose what set your variables should choose from</h3>
+            <h3>Choose what set your variables should use</h3>
             <table id="setSelectTable">
                 <thead>
                     <tr>
@@ -67,7 +67,7 @@
                 </tbody>
             </table>
 
-            <h3>What's in each set</h3>
+            <h3>Sets</h3>
             <table>
                 <thead>
                     <tr>
@@ -95,6 +95,24 @@
                 </div>
             </details>
 
+            <h3>Other options</h3>
+
+            <input type="checkbox" id="positiveAllowedButton">
+            <label for="positiveAllowedButton">Positive answers allowed</label>
+            <br>
+
+            <input type="checkbox" id="negativeAllowedButton">
+            <label for="negativeAllowedButton">Negative answers allowed</label>
+            <br>
+
+            <input type="checkbox" id="integerOnlyButton">
+            <label for="integerOnlyButton">Integer answers only <small>(This will try to pick numbers that produce whole number answers)</small></label>
+            <br>
+
+            <hr>
+
+            <div style="display:none">
+
             <h3>Selected options</h3>
             <span id="selectedOptionsDisplay">...</span>
 
@@ -114,52 +132,50 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
+
+            <input type="checkbox" id="mixedOptionsButton">
+            <label for="mixedOptionsButton">Enable mixed options <small>(Multiple different types of operations can appear)</small></label>
+            <div id="mixedOptionsDisplay">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Question</th>
+                            <th>Sets</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="mixedOptionsTable">
+                        <tr>
+                            <td>
+                                <i>Loading...</i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button id="mixedOptionsAddButton">Add current options to the mixed list</button>
+                <button id="mixedOptionsResetButton" class="secondary">Reset</button>
+            </div>
+            <br>
+            <br>
 
             <details>
-                <summary>Advanced options</summary>
+                <summary>Preferences</summary>
 
-                <input type="checkbox" id="positiveAllowedButton">
-                <label for="positiveAllowedButton">Positive answers allowed</label>
-                <br>
-
-                <input type="checkbox" id="negativeAllowedButton">
-                <label for="negativeAllowedButton">Negative answers allowed</label>
-                <br>
-
-                <input type="checkbox" id="integerOnlyButton">
-                <label for="integerOnlyButton">Integer answers only <small>(This will try to pick numbers that produce whole number answers)</small></label>
-                <br>
-                
-                <input type="checkbox" id="mixedOptionsButton">
-                <label for="mixedOptionsButton">Enable mixed options <small>(Multiple different types of operations can appear)</small></label>
-                <div id="mixedOptionsDisplay">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Question</th>
-                                <th>Sets</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="mixedOptionsTable">
-                            <tr>
-                                <td>
-                                    <i>Loading...</i>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <button id="mixedOptionsAddButton">Add current options to the mixed list</button>
-                    <button id="mixedOptionsResetButton" class="secondary">Reset</button>
-                </div>
+                <input type="checkbox" id="answersWaitScreenButton">
+                <label for="answersWaitScreenButton">Answers wait screen <small>(Await button press before going to answers screen)</small></label>
             </details>
+
+            <button id="resetButton" class="outline secondary">Reset options</button>
+
+            <hr>
 
             <button id="generateButton">Generate!</button>
             <button id="shareButton" class="secondary">Share</button><a id="shareLinkDisplay"></a>
             <br>
-            <button id="resetButton" class="outline secondary">Reset options</button>
-            
+            <br>
+
             <footer>
                 Made by CappaBot<br>
                 <a href="/terms-of-service">Terms of service</a> | <a href="/privacy-policy">Privacy policy</a>
