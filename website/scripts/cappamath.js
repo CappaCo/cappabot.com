@@ -118,7 +118,7 @@ function makeOptionsProxy(raw) {
 
 function optionsUpdated() {
     localStorage.setItem("CappaMath-options", JSON.stringify(options));
-    displaySelectedOptions();
+    //displaySelectedOptions();
 }
 
 function init() {
@@ -427,7 +427,7 @@ mixedOptionsResetButton.addEventListener("click", () => {
     updateMixedOptions();
 });
 
-// Display current selected options
+// Display current selected options DEPRECATED
 function displaySelectedOptions() {
     selectedOptionsDisplay.innerHTML = `
         <strong>Number of Questions:</strong> ${options.numQuestions} <br>
