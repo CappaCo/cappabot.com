@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Casper Howse Resume</title>
+        <meta name="viewport" content="width=device-width">
+
+        <style>
+            * {
+                font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            body {
+                margin: 0;
+            }
+
+            #main-grid {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                margin: 10px;
+            }
+
+            #title-section {
+                background-color: #ffaaaa;
+                grid-column: 1 / -1;
+                text-align: center;
+            }
+
+            #left-section {
+                background-color: #aaffaa;
+            }
+
+            #right-section {
+                background-color: #aaaaff;
+            }
+
+            #footer-section {
+                background-color: #ffaaaa;
+                grid-column: 1 / -1;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main-grid">
+            <h1 id="title-section">
+                Casper Howse
+            </h1>
+            <section id="left-section">
+                <h2>Contact</h2>
+                <ul>
+                    <li>027 203 4598</li>
+                    <li>casperhowse@gmail.com</li>
+                    <li>Northcote, Auckland</li>
+                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/casper-howse/">www.linkedin.com/in/casper-howse/</a></li>
+                </ul>
+            </section>
+            <section id="right-section">
+                Right side
+            </section>
+            <footer id="footer-section">
+                hi i'm foot
+            </footer>
+        </div>
+    </body>
+</html>
