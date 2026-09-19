@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- Title the webiste tab -->
+        <title>ChatWebview - CappaBot</title>
+        <!-- Use the pico stylesheet because it looks cool -->
+        <link rel="stylesheet" href="styles/pico.min.css" type="text/css">
+        <!-- Extra stylesheet for chat -->
+        <link rel="stylesheet" href="styles/chat.css" type="text/css">
+        <meta name="viewport" content="width=device-width">
+        <meta name="description" content="CappaChat webview client. Made by CappaBot.">
+        <style>
+            body {
+                height: 100vh;
+                width: 100vw;
+            }
+
+            #chatContainer {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                width: 100%;
+                padding: 20px;
+                margin: 0;
+            }
+
+            #chatContainer article {
+                flex-direction: column-reverse;
+                display: flex;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+
+            #inputField {
+                height: auto;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <section id="chatContainer">
+            <h1>CappaChat in a webview</h1>
+            <article style="flex-direction: column-reverse; display: flex; height: 50vh; overflow-y: auto;">
+                <div id="messagesField" style="padding: 10px;">
+                    <!-- Messages will appear here -->
+                    <div id="loadingAnimation" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                        <svg width="40" height="40" viewBox="0 0 40 40" aria-label="Loading">
+                            <circle cx="20" cy="20" r="16" stroke="#888" stroke-width="4" fill="none" opacity="0.2"/>
+                            <circle cx="20" cy="20" r="16" stroke="#0078d4" stroke-width="4" fill="none" stroke-linecap="round"
+                                stroke-dasharray="80" stroke-dashoffset="60">
+                                <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20"
+                                    dur="1s" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
+                    </div>
+                </div>
+            </article>
+            <div style="margin-top: 10px; display: flex; gap: 10px; flex-direction: row;">
+                <button id="changeUsernameButton" style="flex-shrink: 0;">Change username</button>
+                <input id="inputField" type="text" placeholder="Type your message..." style="height: auto; margin: 0;">
+                <button id="sendButton">Send</button>
+            </div>
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+        <script src="scripts/chat.js" type="text/javascript"></script>
+        <script src="scripts/main.js" type="text/javascript"></script>
+    </body>
+</html>

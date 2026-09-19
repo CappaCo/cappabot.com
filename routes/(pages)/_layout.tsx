@@ -5,11 +5,7 @@ export default define.layout(({ Component }) => {
     return (
         <>
             <Head>
-                <link
-                    rel="stylesheet"
-                    href="/styles/pico.min.css"
-                    type="text/css"
-                />
+                <PicoStyle />
             </Head>
             <main class="container">
                 <hgroup>
@@ -39,3 +35,13 @@ export default define.layout(({ Component }) => {
         </>
     );
 });
+
+function PicoStyle() {
+    return (
+        <link
+            rel="stylesheet"
+            href="/styles/pico.min.css"
+            type="text/css"
+        />
+    );
+}
