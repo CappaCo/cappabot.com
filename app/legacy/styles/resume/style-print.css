@@ -1,0 +1,35 @@
+/* Print-friendly overrides */
+
+body {
+    background: white;
+    color: black;
+}
+
+#main-grid {
+    margin: 0;
+    gap: 12px;
+    grid-template-columns: 1fr 2fr;
+}
+
+#title-section {
+    border-radius: 0;
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+#left-section,
+#right-section {
+    background: none;
+    border-radius: 0;
+    padding: 8px;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+#footer-section {
+    border-top: 1px solid black;
+    color: black;
+}

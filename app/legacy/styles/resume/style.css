@@ -1,0 +1,94 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    background-color: #f4f4f4;
+    color: #222;
+}
+
+#main-grid {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr;
+    gap: 16px;
+    margin: 20px;
+}
+
+/* Header */
+#title-section {
+    grid-column: 1 / -1;
+    padding: 24px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 16px;
+}
+
+#title-section h1 {
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+.subtitle {
+    margin-top: 8px;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Left column */
+#left-section {
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 6px;
+}
+
+#left-section h2 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 4px;
+}
+
+.contact-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.contact-list li {
+    margin-bottom: 6px;
+}
+
+/* Right column */
+#right-section {
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 6px;
+}
+
+#right-section h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 4px;
+}
+
+article {
+    margin-bottom: 16px;
+}
+
+article h3 {
+    margin-bottom: 4px;
+}
+
+.meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+/* Footer */
+#footer-section {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 12px;
+    font-size: 0.9rem;
+    color: #666;
+}
