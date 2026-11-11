@@ -1,0 +1,40 @@
+/* Print-friendly overrides */
+
+@media print {
+    @page {
+        margin: 0.5in;
+    }
+
+    :root {
+        --background: #fff;
+        --background-front: #fff;
+        --foreground: #000;
+    }
+
+    #main-grid {
+        margin: 0;
+        gap: 12px;
+        grid-template-columns: 1.1fr 2fr;
+    }
+
+    #title-section {
+        border-radius: 0;
+        border-bottom: 2px solid var(--foreground);
+    }
+
+    #left-section,
+    #right-section {
+        border-radius: 0;
+        padding: 8px;
+    }
+
+    a {
+        color: var(--foreground);
+        text-decoration: none;
+    }
+
+    #footer-section {
+        border-top: 1px solid var(--foreground);
+        color: var(--foreground);
+    }
+}

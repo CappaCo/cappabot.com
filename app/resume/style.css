@@ -1,3 +1,12 @@
+:root {
+    --background: #f0f0f0;
+    --background-front: #ffffff;
+    --foreground: #111;
+    --foreground-faded: #666;
+    --underline: #ddd;
+    --border-radius: 16px;
+}
+
 * {
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -5,24 +14,25 @@
 
 body {
     margin: 0;
-    background-color: #f4f4f4;
-    color: #222;
+    background-color: var(--background);
+    color: var(--foreground);
 }
 
 #main-grid {
     display: grid;
-    grid-template-columns: 1fr 2.5fr;
-    gap: 16px;
-    margin: 20px;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    margin: 24px;
 }
 
 /* Header */
 #title-section {
+    background-color: var(--background-front);
     grid-column: 1 / -1;
     padding: 24px;
     text-align: center;
-    border: 2px solid black;
-    border-radius: 16px;
+    /* border: 2px solid black; */
+    border-radius: var(--border-radius);
 }
 
 #title-section h1 {
@@ -30,24 +40,29 @@ body {
     font-size: 2.2rem;
 }
 
+/* #title-section p.subtitle {
+    text-wrap: nowrap;
+} */
+
 .subtitle {
     margin-top: 8px;
     font-size: 1.1rem;
     opacity: 0.9;
 }
 
-/* Left column */
-#left-section {
-    background-color: #ffffff;
+#left-section, #right-section {
+    background-color: var(--background-front);
     padding: 16px;
-    border-radius: 6px;
+    border-radius: var(--border-radius);
 }
 
-#left-section h2 {
-    border-bottom: 2px solid #ddd;
+h2 {
+    margin-top: 0;
+    border-bottom: 2px solid var(--underline);
     padding-bottom: 4px;
 }
 
+/* Left column */
 .contact-list {
     list-style: none;
     padding-left: 0;
@@ -58,17 +73,6 @@ body {
 }
 
 /* Right column */
-#right-section {
-    background-color: #ffffff;
-    padding: 16px;
-    border-radius: 6px;
-}
-
-#right-section h2 {
-    margin-top: 0;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 4px;
-}
 
 article {
     margin-bottom: 16px;
@@ -80,7 +84,7 @@ article h3 {
 
 .meta {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--foreground-faded);
     margin-bottom: 6px;
 }
 
@@ -88,7 +92,6 @@ article h3 {
 #footer-section {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 12px;
     font-size: 0.9rem;
-    color: #666;
+    color: var(--foreground-faded);
 }
