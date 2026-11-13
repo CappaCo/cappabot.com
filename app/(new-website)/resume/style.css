@@ -1,0 +1,108 @@
+:root {
+    --background: #f0f0f0;
+    --background-front: #ffffff;
+    --foreground: #111;
+    --foreground-faded: #666;
+    --underline: #ddd;
+    --border-radius: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
+#print-note {
+    display: none;
+}
+
+@-moz-document url-prefix() {
+    #print-note {
+        display: initial;
+    }
+}
+
+#main-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    margin: 24px;
+
+    * {
+        /* undo tailwind */
+        all: revert;
+    }
+
+    /* Header */
+    #title-section {
+        background-color: var(--background-front);
+        grid-column: 1 / -1;
+        padding: 24px;
+        text-align: center;
+        /* border: 2px solid black; */
+        border-radius: var(--border-radius);
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+    }
+
+    .subtitle {
+        margin-top: 8px;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    #left-section,
+    #right-section {
+        background-color: var(--background-front);
+        padding: 16px;
+        border-radius: var(--border-radius);
+    }
+
+    h2 {
+        margin-top: 0;
+        border-bottom: 2px solid var(--underline);
+        padding-bottom: 4px;
+    }
+
+    /* Left column */
+    .contact-list {
+        list-style: none;
+        padding-left: 0;
+
+        li {
+            margin-bottom: 6px;
+        }
+    }
+
+    /* Right column */
+
+    article {
+        margin-bottom: 16px;
+    }
+
+    article h3 {
+        margin-bottom: 4px;
+    }
+
+    .meta {
+        font-size: 0.9rem;
+        color: var(--foreground-faded);
+        margin-bottom: 6px;
+    }
+
+    /* Footer */
+    #footer-section {
+        grid-column: 1 / -1;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--foreground-faded);
+    }
+}

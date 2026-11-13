@@ -1,4 +1,4 @@
-console.log("Main.js is running!");
+console.log("matter-test-something.js is running");
 
 // Settings object to store all settings
 const settings = {
