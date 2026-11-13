@@ -1,5 +1,5 @@
-import Contact from "../contact.tsx";
-import Header from "../header.tsx";
+import Contact from "../contact";
+import Header from "../header";
 
 export const metadata = {
     title: "Resume - Casper Howse",
