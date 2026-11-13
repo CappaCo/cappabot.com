@@ -1,10 +1,6 @@
 import Contact from "./contact";
 import Header from "./header";
 
-export const metadata = {
-    title: "Resume - Casper Howse",
-};
-
 export default function Page() {
     return (
         <div id="main-grid">

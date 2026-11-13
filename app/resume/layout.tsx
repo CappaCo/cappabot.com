@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
+
 import "./style.css";
 import "./print.css";
+
+export const metadata: Metadata = {
+    title: "Resume - Casper Howse",
+    description: "Casper Howse Resume",
+};
 
 export default function ResumeLayout(
     { children }: LayoutProps<"/resume">,
