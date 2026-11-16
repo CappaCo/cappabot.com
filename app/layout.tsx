@@ -15,7 +15,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             lang="en"
             className="h-full dark:bg-black dark:text-white"
         >
-            <body className={`${inter.className} min-h-full text-center`}>
+            <body className={`${inter.className} min-h-full`}>
                 {children}
             </body>
         </html>

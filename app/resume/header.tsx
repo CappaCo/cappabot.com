@@ -2,7 +2,7 @@ export default function Header() {
     return (
         <header id="title-section">
             <h1>Casper Howse</h1>
-            <em>please hire me 🙏</em>
+            <em>Reliable Team Member with Attention to Detail</em>
             {/* <p className="subtitle">
                 Reliable Team Member · Strong Communication & Leadership
                 <br />
