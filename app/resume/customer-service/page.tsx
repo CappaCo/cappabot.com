@@ -5,7 +5,7 @@ import { Profile } from "../profile.tsx";
 import { Projects } from "../projects.tsx";
 
 export const metadata: Metadata = {
-    title: "Customer Service Resume - Casper Howse"
+    title: "Casper Howse - Customer Service Resume"
 }
 
 export default function Page() {
