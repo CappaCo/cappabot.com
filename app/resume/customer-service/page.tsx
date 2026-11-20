@@ -1,7 +1,12 @@
+import { Metadata } from "next";
 import Contact from "../contact";
 import Header from "../header";
 import { Profile } from "../profile.tsx";
 import { Projects } from "../projects.tsx";
+
+export const metadata: Metadata = {
+    title: "Customer Service Resume - Casper Howse"
+}
 
 export default function Page() {
     return (
