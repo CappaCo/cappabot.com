@@ -4,7 +4,16 @@ export default function Contact() {
             <h2>Contact</h2>
             <ul className="contact-list">
                 <li>📞 027 203 4598</li>
-                <li>✉️ casperhowse@gmail.com</li>
+                <li>
+                    ✉️{" "}
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="mailto:casperhowse@gmail.com"
+                    >
+                        casperhowse@gmail.com
+                    </a>
+                </li>
                 <li>📍 Northcote, Auckland</li>
                 <li>
                     🔗{" "}
